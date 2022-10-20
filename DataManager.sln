@@ -1,0 +1,88 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository Files", "Repository Files", "{06970F0A-54D8-4B28-ADEC-C9C672BCB93B}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+		src\CommonAssemblyInfo.cs = src\CommonAssemblyInfo.cs
+		src\Directory.Build.props = src\Directory.Build.props
+		src\Directory.Build.targets = src\Directory.Build.targets
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build.vs", "build.vs", "{304A52A3-9584-4007-9B94-1A7FF1D5ADD5}"
+	ProjectSection(SolutionItems) = preProject
+		build.vs\.gitignore = build.vs\.gitignore
+		build.vs\Build.psm1 = build.vs\Build.psm1
+		build.vs\CheckCommitIsTagged.psm1 = build.vs\CheckCommitIsTagged.psm1
+		build.vs\Clean.psm1 = build.vs\Clean.psm1
+		build.vs\CombineOutputBinaries.psm1 = build.vs\CombineOutputBinaries.psm1
+		build.vs\Configuration.psm1 = build.vs\Configuration.psm1
+		build.vs\ConvertMarkdown2Html.psm1 = build.vs\ConvertMarkdown2Html.psm1
+		build.vs\CopyFilesFromListToFolder.psm1 = build.vs\CopyFilesFromListToFolder.psm1
+		build.vs\CopyToReleaseFolder.psm1 = build.vs\CopyToReleaseFolder.psm1
+		build.vs\Directory.Build.Cpp.props = build.vs\Directory.Build.Cpp.props
+		build.vs\Directory.Build.Cpp.targets = build.vs\Directory.Build.Cpp.targets
+		build.vs\Directory.Build.Cs.props = build.vs\Directory.Build.Cs.props
+		build.vs\Directory.Build.Cs.targets = build.vs\Directory.Build.Cs.targets
+		build.vs\Directory.Build.props = build.vs\Directory.Build.props
+		build.vs\Directory.Build.targets = build.vs\Directory.Build.targets
+		build.vs\GithubStyle.css = build.vs\GithubStyle.css
+		build.vs\GitVersion.psm1 = build.vs\GitVersion.psm1
+		build.vs\GitVersion.yml = build.vs\GitVersion.yml
+		build.vs\Helper.psm1 = build.vs\Helper.psm1
+		build.vs\LICENSE = build.vs\LICENSE
+		build.vs\LicenseCollector.psm1 = build.vs\LicenseCollector.psm1
+		build.vs\NuGet.msbuild = build.vs\NuGet.msbuild
+		build.vs\PackNuGet.psm1 = build.vs\PackNuGet.psm1
+		build.vs\PreBuildWizard.psm1 = build.vs\PreBuildWizard.psm1
+		build.vs\PublishNuGet.psm1 = build.vs\PublishNuGet.psm1
+		build.vs\README.md = build.vs\README.md
+		build.vs\ReSharper.DotSettings = build.vs\ReSharper.DotSettings
+		build.vs\RestoreNuGet.psm1 = build.vs\RestoreNuGet.psm1
+		build.vs\UpdateOutputFileList.psm1 = build.vs\UpdateOutputFileList.psm1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-pipelines", "azure-pipelines", "{ECE67906-3564-47F6-AD56-4F8BEEB080C4}"
+	ProjectSection(SolutionItems) = preProject
+		build.vs\azure-pipelines\ci-csharp-netstandard20-with-deployment-on-tag.yml = build.vs\azure-pipelines\ci-csharp-netstandard20-with-deployment-on-tag.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{EF917601-C2AD-4FF0-AF68-C35ED8BAA5A5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\configuration.md = docs\configuration.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GriffinPlus.Lib.DataManager", "src\GriffinPlus.Lib.DataManager\GriffinPlus.Lib.DataManager.csproj", "{2DD50B93-7A62-4EE8-8019-EC025927960A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GriffinPlus.Lib.DataManager.Tests", "src\GriffinPlus.Lib.DataManager.Tests\GriffinPlus.Lib.DataManager.Tests.csproj", "{6736B6BC-305F-4D2E-8CE6-B7E61625EE7E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DD50B93-7A62-4EE8-8019-EC025927960A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DD50B93-7A62-4EE8-8019-EC025927960A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DD50B93-7A62-4EE8-8019-EC025927960A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DD50B93-7A62-4EE8-8019-EC025927960A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6736B6BC-305F-4D2E-8CE6-B7E61625EE7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6736B6BC-305F-4D2E-8CE6-B7E61625EE7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6736B6BC-305F-4D2E-8CE6-B7E61625EE7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6736B6BC-305F-4D2E-8CE6-B7E61625EE7E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ECE67906-3564-47F6-AD56-4F8BEEB080C4} = {304A52A3-9584-4007-9B94-1A7FF1D5ADD5}
+		{EF917601-C2AD-4FF0-AF68-C35ED8BAA5A5} = {06970F0A-54D8-4B28-ADEC-C9C672BCB93B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {144ED164-6EC1-42FC-912C-EB9C920DB329}
+	EndGlobalSection
+EndGlobal

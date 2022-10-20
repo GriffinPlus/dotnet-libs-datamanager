@@ -1,0 +1,4 @@
+﻿.\GriffinPlus.Lib.DataManager.deps.json
+.\GriffinPlus.Lib.DataManager.dll
+.\GriffinPlus.Lib.DataManager.pdb
+.\GriffinPlus.Lib.DataManager.xml
