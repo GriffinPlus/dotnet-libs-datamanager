@@ -1,18 +1,38 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0; netstandard2.1; net461; net48; net5.0; net6.0; net7.0; net8.0</TargetFrameworks>
 		<AssemblyName>GriffinPlus.Lib.DataManager</AssemblyName>
 		<RootNamespace>GriffinPlus.Lib.DataManager</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<!--
+		CommunityToolkit.HighPerformance 7.1.2 depends on System.Runtime.CompilerServices.Unsafe 5.0.0
+		that is needed for support of .NET Core 2.2
+		-->
+		<PackageReference Include="CommunityToolkit.HighPerformance" Version="7.1.2" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+	</ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="GriffinPlus.Lib.Common" Version="3.4.0" />
+		<PackageReference Include="GriffinPlus.Lib.Logging.Interface" Version="1.1.1" />
+		<PackageReference Include="GriffinPlus.Lib.Serialization" Version="2.2.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+		<PackageReference Include="PolySharp" Version="1.14.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

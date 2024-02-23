@@ -5,7 +5,7 @@
 		<id>GriffinPlus.Lib.DataManager</id>
 		<version>$version$</version>
 		<authors>Sascha Falk</authors>
-		<copyright>Copyright (c) 2022 Sascha Falk and Contributors</copyright>
+		<copyright>Copyright (c) 2024 Sascha Falk and Contributors</copyright>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>A hierarchical storage for serializable data for .NET.</description>
 		<license type="expression">MIT</license>
@@ -14,6 +14,51 @@
 		<tags></tags>
 		<dependencies>
 			<group targetFramework="netstandard2.0">
+				<dependency id="CommunityToolkit.HighPerformance" version="7.1.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="netstandard2.1">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net461">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net48">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net5.0">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net6.0">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net7.0">
+				<dependency id="CommunityToolkit.HighPerformance" version="8.2.2" />
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
+			</group>
+			<group targetFramework="net8.0">
+				<dependency id="GriffinPlus.Lib.Common" version="[3.4.0,4)" />
+				<dependency id="GriffinPlus.Lib.Logging.Interface" version="1.1.1" />
+				<dependency id="GriffinPlus.Lib.Serialization" version="[2.2.0,3)" />
 			</group>
 		</dependencies>
 	</metadata>
@@ -22,5 +67,26 @@
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.0\GriffinPlus.Lib.DataManager.dll" target="lib\netstandard2.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.0\GriffinPlus.Lib.DataManager.pdb" target="lib\netstandard2.0" />
 		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.0\GriffinPlus.Lib.DataManager.xml" target="lib\netstandard2.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.1\GriffinPlus.Lib.DataManager.dll" target="lib\netstandard2.1" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.1\GriffinPlus.Lib.DataManager.pdb" target="lib\netstandard2.1" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\netstandard2.1\GriffinPlus.Lib.DataManager.xml" target="lib\netstandard2.1" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net461\GriffinPlus.Lib.DataManager.dll" target="lib\net461" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net461\GriffinPlus.Lib.DataManager.pdb" target="lib\net461" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net461\GriffinPlus.Lib.DataManager.xml" target="lib\net461" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net48\GriffinPlus.Lib.DataManager.dll" target="lib\net48" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net48\GriffinPlus.Lib.DataManager.pdb" target="lib\net48" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net48\GriffinPlus.Lib.DataManager.xml" target="lib\net48" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net5.0\GriffinPlus.Lib.DataManager.dll" target="lib\net5.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net5.0\GriffinPlus.Lib.DataManager.pdb" target="lib\net5.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net5.0\GriffinPlus.Lib.DataManager.xml" target="lib\net5.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net6.0\GriffinPlus.Lib.DataManager.dll" target="lib\net6.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net6.0\GriffinPlus.Lib.DataManager.pdb" target="lib\net6.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net6.0\GriffinPlus.Lib.DataManager.xml" target="lib\net6.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net7.0\GriffinPlus.Lib.DataManager.dll" target="lib\net7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net7.0\GriffinPlus.Lib.DataManager.pdb" target="lib\net7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net7.0\GriffinPlus.Lib.DataManager.xml" target="lib\net7.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net8.0\GriffinPlus.Lib.DataManager.dll" target="lib\net8.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net8.0\GriffinPlus.Lib.DataManager.pdb" target="lib\net8.0" />
+		<file src="..\..\..\_build\.out\GriffinPlus.Lib.DataManager\AnyCPU.Release\net8.0\GriffinPlus.Lib.DataManager.xml" target="lib\net8.0" />
 	</files>
 </package>
