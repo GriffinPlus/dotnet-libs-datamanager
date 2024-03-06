@@ -29,7 +29,7 @@ unsafe ref struct PathParser
 	/// <param name="path">Path to parse.</param>
 	/// <param name="validate"><c>true</c> to validate <paramref name="path"/>; otherwise <c>false</c>.</param>
 	/// <exception cref="ArgumentException">The specified <paramref name="path"/> is malformed and failed validation.</exception>
-	public static PathParser Create(in ReadOnlySpan<char> path, in bool validate = true)
+	public static PathParser Create(ReadOnlySpan<char> path, bool validate = true)
 	{
 		var parser = new PathParser();
 		parser.Reinitialize(path, validate);
@@ -42,7 +42,7 @@ unsafe ref struct PathParser
 	/// <param name="path">Path to parse.</param>
 	/// <param name="validate"><c>true</c> to validate <paramref name="path"/>; otherwise <c>false</c>.</param>
 	/// <exception cref="ArgumentException">The specified <paramref name="path"/> is malformed and failed validation.</exception>
-	public void Reinitialize(in ReadOnlySpan<char> path, in bool validate = true)
+	public void Reinitialize(ReadOnlySpan<char> path, bool validate = true)
 	{
 		Path = path.Trim();
 		IsAbsolutePath = Path.Length > 0 && Path[0] == SeparatorChar;
