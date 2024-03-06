@@ -199,7 +199,7 @@ public partial class DataNode : IInternalObjectSerializer
 			{
 				// child node
 				DataTreeManager = context.ParentNode.DataTreeManager;
-				mPath = PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan());
+				mPath = PathHelpers.AppendNameToPath(mParent.mPath, mName.AsSpan());
 			}
 			else
 			{
