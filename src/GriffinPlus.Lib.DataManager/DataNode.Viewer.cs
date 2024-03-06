@@ -88,7 +88,7 @@ partial class DataNode
 	/// Gets a <see cref="ViewerDataNode"/> wrapping the current node for a viewer.
 	/// </summary>
 	/// <returns>The wrapper node.</returns>
-	internal ViewerDataNode ViewerWrapper
+	public ViewerDataNode ViewerWrapper
 	{
 		get
 		{
