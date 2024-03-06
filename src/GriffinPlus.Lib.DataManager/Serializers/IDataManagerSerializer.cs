@@ -48,7 +48,7 @@ public interface IDataManagerSerializer
 	/// </summary>
 	/// <param name="stream">Stream containing the serialized data tree to load.</param>
 	/// <param name="dataTreeManagerHost">
-	/// Data tree manager host to use (<c>null</c> to use <see cref="DataTreeManagerHost.Default"/>).
+	/// Data tree manager host to use (<c>null</c> to use <see cref="DataManager.DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <returns>Root node of the loaded data tree.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="stream"/> is <c>null</c>.</exception>
@@ -69,7 +69,7 @@ public interface IDataManagerSerializer
 	/// </summary>
 	/// <param name="fileName">Name of the file to read the specified file from.</param>
 	/// <param name="dataTreeManagerHost">
-	/// Data tree manager host to use (<c>null</c> to use <see cref="DataTreeManagerHost.Default"/>).
+	/// Data tree manager host to use (<c>null</c> to use <see cref="DataManager.DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <returns>Root node of the loaded data tree.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="fileName"/> is <c>null</c>.</exception>

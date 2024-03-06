@@ -52,7 +52,7 @@ public sealed partial class ChildDataNodeCollection :
 					this,
 					ChangedEventName,
 					value,
-					SynchronizationContext.Current ?? mNode.DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -82,7 +82,7 @@ public sealed partial class ChildDataNodeCollection :
 					this,
 					ChangedEventName,
 					value,
-					mNode.DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -607,6 +607,7 @@ public sealed partial class ChildDataNodeCollection :
 		{
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET48
 			// ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+			// ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 			foreach (DataNode node in mBuffer)
 #else
 			foreach (DataNode node in CollectionsMarshal.AsSpan(mBuffer))

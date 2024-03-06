@@ -26,7 +26,7 @@ public class DataTreeManager
 	/// <param name="root">Root node of the data tree to manage.</param>
 	internal DataTreeManager(DataTreeManager manager, DataNode root)
 	{
-		DataTreeManagerHost = manager.DataTreeManagerHost;
+		Host = manager.Host;
 		Serializer = manager.Serializer;
 		Sync = manager.Sync;
 
@@ -46,7 +46,7 @@ public class DataTreeManager
 	/// <param name="serializer">Serializer to use for serializing, deserializing and copying data in the data tree.</param>
 	internal DataTreeManager(DataTreeManagerHost host, DataNode root, IDataManagerSerializer serializer)
 	{
-		DataTreeManagerHost = host;
+		Host = host;
 		Serializer = serializer;
 		Sync = new object();
 
@@ -79,9 +79,9 @@ public class DataTreeManager
 	public DataNode RootNode => mRootNode.TryGetTarget(out DataNode node) ? node : null;
 
 	/// <summary>
-	/// Gets the <see cref="DataTreeManagerHost"/> that hosts the current instance.
+	/// Gets the <see cref="Host"/> that hosts the current instance.
 	/// </summary>
-	public DataTreeManagerHost DataTreeManagerHost { get; }
+	public DataTreeManagerHost Host { get; }
 
 	#region Managing Data<T> Object Monitoring
 

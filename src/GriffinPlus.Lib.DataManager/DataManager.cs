@@ -93,7 +93,7 @@ public sealed class DataManager
 	/// </summary>
 	/// <param name="dataTreeManagerHost">
 	/// Data tree manager host to use
-	/// (<c>null</c> to use the default host specified by <see cref="DataTreeManagerHost.Default"/>).
+	/// (<c>null</c> to use the default host specified by <see cref="DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <param name="serializer">
 	/// Serializer to use for serializing, deserializing and copying data in the data tree
@@ -112,7 +112,7 @@ public sealed class DataManager
 	/// <param name="filename">File to load initially.</param>
 	/// <param name="dataTreeManagerHost">
 	/// Data tree manager host to use
-	/// (<c>null</c> to use the default host specified by <see cref="DataTreeManagerHost.Default"/>).
+	/// (<c>null</c> to use the default host specified by <see cref="DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <param name="serializer">
 	/// Serializer to use for serializing, deserializing and copying data in the data tree
@@ -135,7 +135,7 @@ public sealed class DataManager
 	/// <param name="fileToSave">File to save to (when saving is triggered).</param>
 	/// <param name="dataTreeManagerHost">
 	/// Data tree manager host to use
-	/// (<c>null</c> to use the default host specified by <see cref="DataTreeManagerHost.Default"/>).
+	/// (<c>null</c> to use the default host specified by <see cref="DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <param name="serializer">
 	/// Serializer to use for serializing, deserializing and copying data in the data tree
@@ -192,6 +192,16 @@ public sealed class DataManager
 			sDefaultInstance = null;
 		}
 	}
+
+	#endregion
+
+	#region Changing the Default Data Tree Manager Host
+
+	/// <summary>
+	/// Gets or sets the default data tree manager host to use. The data tree manager host runs a dedicated thread
+	/// to use perform cleanup tasks and execute event handlers that are not marshalled into a specific thread.
+	/// </summary>
+	public static DataTreeManagerHost DefaultDataTreeManagerHost { get; set; } = DataTreeManagerHost.Default;
 
 	#endregion
 

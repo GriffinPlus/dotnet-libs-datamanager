@@ -44,7 +44,7 @@ public partial class DataNode : IInternalObjectSerializer
 					this,
 					ChangedEventName,
 					value,
-					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -74,7 +74,7 @@ public partial class DataNode : IInternalObjectSerializer
 					this,
 					ChangedEventName,
 					value,
-					DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -99,7 +99,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// <param name="properties">Properties specifying the behaviour of the node.</param>
 	/// <param name="dataTreeManagerHost">
 	/// Data tree manager host to use
-	/// (<c>null</c> to use the default host specified by <see cref="DataTreeManagerHost.Default"/>).
+	/// (<c>null</c> to use the default host specified by <see cref="DataManager.DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <param name="serializer">
 	/// Serializer to use for serializing, deserializing and copying data in the data tree
@@ -124,7 +124,7 @@ public partial class DataNode : IInternalObjectSerializer
 		if ((properties & ~DataNodeProperties.All) != 0)
 			throw new ArgumentException($"The specified properties (0x{properties:X}) contain unsupported flags (0x{properties & ~DataNodeProperties.All:X}).", nameof(properties));
 
-		dataTreeManagerHost ??= DataTreeManagerHost.Default;
+		dataTreeManagerHost ??= DataManager.DefaultDataTreeManagerHost;
 		serializer ??= DataManager.DefaultSerializer;
 
 		// the new node becomes the root node of a data tree
@@ -163,10 +163,9 @@ public partial class DataNode : IInternalObjectSerializer
 		DataNodePropertiesInternal properties)
 	{
 		Debug.Assert(Monitor.IsEntered(parent.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+		Debug.Assert(PathHelpers.IsValidName(name), $"The specified name ({name.ToString()}) does not comply with the rules for node names.");
 
 		DataTreeManager = parent.DataTreeManager;
-
-		Debug.Assert(PathHelpers.IsValidName(name), $"The specified name ({name.ToString()}) does not comply with the rules for node names.");
 
 		mName = name.ToString();
 		mProperties = properties;
@@ -271,7 +270,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// Stream containing a node that has been serialized using the specified <paramref name="serializer"/>.
 	/// </param>
 	/// <param name="dataTreeManagerHost">
-	/// Data tree manager host to use (<c>null</c> to use <see cref="DataTreeManagerHost.Default"/>).
+	/// Data tree manager host to use (<c>null</c> to use <see cref="DataManager.DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <param name="serializer">
 	/// Serializer to use for serializing, deserializing and copying data in the data tree
@@ -286,7 +285,7 @@ public partial class DataNode : IInternalObjectSerializer
 	{
 		if (stream == null) throw new ArgumentNullException(nameof(stream));
 		serializer ??= DataManager.DefaultSerializer;
-		dataTreeManagerHost ??= DataTreeManagerHost.Default;
+		dataTreeManagerHost ??= DataManager.DefaultDataTreeManagerHost;
 		return serializer.Deserialize(stream, dataTreeManagerHost);
 	}
 
@@ -316,7 +315,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// (<c>null</c> to use <see cref="DataManager.DefaultSerializer"/>).
 	/// </param>
 	/// <param name="dataTreeManagerHost">
-	/// Data tree manager host to use (<c>null</c> to use <see cref="DataTreeManagerHost.Default"/>).
+	/// Data tree manager host to use (<c>null</c> to use <see cref="DataManager.DefaultDataTreeManagerHost"/>).
 	/// </param>
 	/// <returns>Root node of the loaded data tree.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="fileName"/> is <c>null</c>.</exception>
@@ -329,7 +328,7 @@ public partial class DataNode : IInternalObjectSerializer
 	{
 		if (fileName == null) throw new ArgumentNullException(nameof(fileName));
 		serializer ??= DataManager.DefaultSerializer;
-		dataTreeManagerHost ??= DataTreeManagerHost.Default;
+		dataTreeManagerHost ??= DataManager.DefaultDataTreeManagerHost;
 		return serializer.ReadFromFile(fileName, dataTreeManagerHost);
 	}
 
@@ -376,6 +375,7 @@ public partial class DataNode : IInternalObjectSerializer
 			lock (DataTreeManager.Sync)
 			{
 				// make the node regular, if it is a dummy node before proceeding
+				// (the ViewerDataNode class uses this property as well, so this node can also be dummy...)
 				if (IsDummyUnsynced) Regularize();
 
 				// abort if the name did not change
@@ -389,7 +389,7 @@ public partial class DataNode : IInternalObjectSerializer
 				// remove data value references from data values below that node
 				IUntypedDataInternal[] references = DataTreeManager.UnregisterDataValueReferencesBelowNodeUnsynced(this, true);
 
-				// change the name and the resulting path and raise the 'Changed' event
+				// change the name and the resulting path and raise the appropriate events
 				mName = value;
 				mPath = mParent != null ? PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan()) : PathHelpers.RootPath;
 				if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))

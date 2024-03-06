@@ -54,7 +54,7 @@ public partial class DataValueCollection :
 					this,
 					ChangedEventName,
 					value,
-					SynchronizationContext.Current ?? mNode.DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -84,7 +84,7 @@ public partial class DataValueCollection :
 					this,
 					ChangedEventName,
 					value,
-					mNode.DataTreeManager.DataTreeManagerHost.SynchronizationContext,
+					mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -672,6 +672,7 @@ public partial class DataValueCollection :
 		{
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NET461 || NET48
 			// ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+			// ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 			foreach (IUntypedDataValueInternal dataValue in mBuffer)
 #else
 			foreach (IUntypedDataValueInternal dataValue in CollectionsMarshal.AsSpan(mBuffer))
