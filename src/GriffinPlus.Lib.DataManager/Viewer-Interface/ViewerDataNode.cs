@@ -49,13 +49,25 @@ public sealed class ViewerDataNode
 	public DataTreeManager DataTreeManager => WrappedNode.DataTreeManager;
 
 	/// <inheritdoc cref="DataNode.Name"/>
-	public string Name => WrappedNode.Name;
+	public string Name
+	{
+		get => WrappedNode.Name;
+		set => WrappedNode.Name = value;
+	}
 
 	/// <inheritdoc cref="DataNode.Properties"/>
-	public DataNodeProperties Properties => WrappedNode.Properties;
+	public DataNodeProperties Properties
+	{
+		get => WrappedNode.Properties;
+		set => WrappedNode.Properties = value;
+	}
 
 	/// <inheritdoc cref="DataNode.IsPersistent"/>
-	public bool IsPersistent => WrappedNode.IsPersistent;
+	public bool IsPersistent
+	{
+		get => WrappedNode.IsPersistent;
+		set => WrappedNode.IsPersistent = value;
+	}
 
 	/// <inheritdoc cref="DataNode.ViewerIsDummy"/>
 	public bool IsDummy => WrappedNode.ViewerIsDummy;
