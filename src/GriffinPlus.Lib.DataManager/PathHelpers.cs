@@ -31,16 +31,26 @@ static class PathHelpers
 	/// </returns>
 	/// <remarks>
 	/// This method considers any name valid that fulfills the following requirements:<br/>
-	/// - does not contain control characters from control code set C0 (U+0000 to U+001F)<br/>
-	/// - does not contain control characters from control code set C1 (U+0080 to U+009F)<br/>
+	/// - Name is not empty (zero length)<br/>
+	/// - Name does not contain any leading or trailing whitespaces<br/>
+	/// - Name does not contain control characters from control code set C0 (U+0000 to U+001F)<br/>
+	/// - Name does not contain control characters from control code set C1 (U+0080 to U+009F)<br/>
 	/// </remarks>
 	public static bool IsValidName(ReadOnlySpan<char> name)
 	{
 		// trim leading/trailing whitespaces to prevent the user from entering an empty string
-		name = name.Trim();
+		ReadOnlySpan<char> trimmedName = name.Trim();
+
+		// names with leading or trailing whitespaces are not valid
+		if (trimmedName.Length < name.Length)
+			return false;
 
 		// empty names are not valid
 		if (name.Length == 0)
+			return false;
+
+		// names exceeding the maximum allowed name length are not valid
+		if (name.Length > MaxNameLength)
 			return false;
 
 		// check whether valid characters are used only
