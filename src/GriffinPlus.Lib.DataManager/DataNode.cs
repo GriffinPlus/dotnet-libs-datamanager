@@ -392,13 +392,21 @@ public partial class DataNode : IInternalObjectSerializer
 				// change the name and the resulting path and raise the appropriate events
 				mName = value;
 				mPath = mParent != null ? PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan()) : PathHelpers.RootPath;
-				if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
+				if (EventManager<DataNodeChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 				{
 					EventManager<DataNodeChangedEventArgs>.FireEvent(
 						this,
 						ChangedEventName,
 						this,
 						new DataNodeChangedEventArgs(this, DataNodeChangedFlags.Name | DataNodeChangedFlags.Path));
+				}
+				if (EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
+				{
+					EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
+						this,
+						ViewerChangedEventName,
+						this,
+						new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.Name | ViewerDataNodeChangedFlags.Path));
 				}
 
 				// change the path of all child nodes and data values
