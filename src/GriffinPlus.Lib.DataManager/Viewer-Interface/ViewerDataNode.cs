@@ -24,6 +24,8 @@ public sealed class ViewerDataNode
 	internal ViewerDataNode(DataNode node)
 	{
 		WrappedNode = node;
+		Children = new ViewerChildDataNodeCollection(node.Children);
+		Values = new ViewerDataValueCollection(node.Values);
 	}
 
 	/// <inheritdoc cref="DataNode.ViewerChanged"/>
@@ -78,11 +80,15 @@ public sealed class ViewerDataNode
 	/// <inheritdoc cref="DataNode.Path"/>
 	public string Path => WrappedNode.Path;
 
-	/// <inheritdoc cref="DataNode.ViewerChildren"/>
-	public ViewerChildDataNodeCollection Children => WrappedNode.ViewerChildren;
+	/// <summary>
+	/// Gets the collection of child nodes associated with the current node.
+	/// </summary>
+	public ViewerChildDataNodeCollection Children { get; }
 
-	/// <inheritdoc cref="DataNode.ViewerValues"/>
-	public ViewerDataValueCollection Values => WrappedNode.ViewerValues;
+	/// <summary>
+	/// Gets collection of values associated with the current node.
+	/// </summary>
+	public ViewerDataValueCollection Values { get; }
 
 	/// <inheritdoc cref="DataNode.ViewerCopy(ViewerDataNode,bool)"/>
 	public ViewerDataNode Copy(ViewerDataNode destinationNode, bool renameIfNecessary = false)

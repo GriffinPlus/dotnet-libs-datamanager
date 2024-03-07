@@ -146,24 +146,6 @@ partial class DataNode
 
 	#endregion
 
-	#region ViewerChildren
-
-	/// <summary>
-	/// Gets the collection of child nodes associated with the current node.
-	/// </summary>
-	internal ViewerChildDataNodeCollection ViewerChildren { get; }
-
-	#endregion
-
-	#region ViewerValues
-
-	/// <summary>
-	/// Gets collection of values associated with the current node.
-	/// </summary>
-	internal ViewerDataValueCollection ViewerValues { get; }
-
-	#endregion
-
 	#region ViewerCopy(...)
 
 	/// <summary>

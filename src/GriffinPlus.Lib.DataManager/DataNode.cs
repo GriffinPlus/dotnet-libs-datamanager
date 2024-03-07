@@ -142,9 +142,6 @@ public partial class DataNode : IInternalObjectSerializer
 		Children = new ChildDataNodeCollection(this);
 		Values = new DataValueCollection(this);
 
-		ViewerChildren = new ViewerChildDataNodeCollection(Children);
-		ViewerValues = new ViewerDataValueCollection(Values);
-
 		// ensure all members are initialized before leaving the constructor
 		// (otherwise some other thread may find a partially initialized object)
 		Thread.MemoryBarrier();
