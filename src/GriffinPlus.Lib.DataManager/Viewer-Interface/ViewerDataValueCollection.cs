@@ -7,9 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using GriffinPlus.Lib.DataManager.Viewer;
-
-namespace GriffinPlus.Lib.DataManager;
+namespace GriffinPlus.Lib.DataManager.Viewer;
 
 /// <summary>
 /// Accessor for the internal state of <see cref="DataValueCollection"/> (for viewers).
