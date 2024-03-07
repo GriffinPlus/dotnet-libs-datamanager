@@ -139,7 +139,7 @@ partial class DataNode
 		{
 			lock (DataTreeManager.Sync)
 			{
-				return mParent != null ? new ViewerDataNode(mParent) : null;
+				return mParent?.ViewerWrapper;
 			}
 		}
 	}
