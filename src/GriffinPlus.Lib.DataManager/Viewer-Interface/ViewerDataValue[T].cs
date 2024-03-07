@@ -57,7 +57,7 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	/// <inheritdoc cref="IUntypedViewerDataValue.WrappedValue"/>
 	internal DataValue<T> WrappedValue { get; }
 
-	/// <inheritdoc />
+	/// <inheritdoc/>
 	IUntypedDataValue IUntypedViewerDataValue.WrappedValue => WrappedValue;
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.DataTreeManager"/>
