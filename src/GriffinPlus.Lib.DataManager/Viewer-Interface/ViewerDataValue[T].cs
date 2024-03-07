@@ -54,10 +54,11 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 		remove => WrappedValue.ViewerUntypedChangedAsync -= value;
 	}
 
-	/// <summary>
-	/// Gets the wrapped data value.
-	/// </summary>
+	/// <inheritdoc cref="IUntypedViewerDataValue.WrappedValue"/>
 	internal DataValue<T> WrappedValue { get; }
+
+	/// <inheritdoc />
+	IUntypedDataValue IUntypedViewerDataValue.WrappedValue => WrappedValue;
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.DataTreeManager"/>
 	public DataTreeManager DataTreeManager => WrappedValue.DataTreeManager;

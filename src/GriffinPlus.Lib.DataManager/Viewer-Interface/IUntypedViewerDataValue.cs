@@ -31,6 +31,11 @@ public interface IUntypedViewerDataValue
 	event EventHandler<UntypedViewerDataValueEventArgs> UntypedChangedAsync;
 
 	/// <summary>
+	/// Gets the wrapped data value.
+	/// </summary>
+	public IUntypedDataValue WrappedValue { get; }
+
+	/// <summary>
 	/// Gets the data tree manager that is responsible for the data tree the data value belongs to.
 	/// </summary>
 	DataTreeManager DataTreeManager { get; }
