@@ -207,22 +207,6 @@ public sealed partial class ChildDataNodeCollection :
 
 	#endregion
 
-	#region RegularNodesOnly
-
-	/// <summary>
-	/// Gets all regular data nodes in the collection (for internal use only, not synchronized).
-	/// </summary>
-	private IEnumerable<DataNode> RegularNodesOnly
-	{
-		get
-		{
-			Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
-			return mBuffer.Where(x => !x.IsDummyUnsynced);
-		}
-	}
-
-	#endregion
-
 	#region Count
 
 	/// <summary>
@@ -249,6 +233,31 @@ public sealed partial class ChildDataNodeCollection :
 		{
 			Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 			return mBuffer.Count;
+		}
+	}
+
+	#endregion
+
+	#region InternalBuffer
+
+	/// <summary>
+	/// Gets the internal list of child data nodes (considers regular and dummy nodes).
+	/// </summary>
+	internal IReadOnlyList<DataNode> InternalBuffer => mBuffer;
+
+	#endregion
+
+	#region RegularNodesOnly
+
+	/// <summary>
+	/// Gets all regular data nodes in the collection (for internal use only, not synchronized).
+	/// </summary>
+	private IEnumerable<DataNode> RegularNodesOnly
+	{
+		get
+		{
+			Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+			return mBuffer.Where(x => !x.IsDummyUnsynced);
 		}
 	}
 
