@@ -239,6 +239,15 @@ public partial class DataValueCollection :
 
 	#endregion
 
+	#region InternalBuffer
+
+	/// <summary>
+	/// Gets the internal list of child data values (considers regular and dummy values).
+	/// </summary>
+	internal IReadOnlyList<IUntypedDataValueInternal> InternalBuffer => mBuffer;
+
+	#endregion
+
 	#region Add(...) / AddDynamically(...)
 
 	/// <summary>
