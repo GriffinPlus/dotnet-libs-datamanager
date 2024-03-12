@@ -9,59 +9,59 @@ using System.Threading;
 namespace GriffinPlus.Lib.DataManager;
 
 /// <summary>
-/// Event arguments for events concerning a single <see cref="IUntypedDataValue"/> in the data manager.
+/// Event arguments for events concerning a single <see cref="IUntypedData"/> in the data manager.
 /// </summary>
-public sealed class UntypedDataValueEventArgs : DataManagerEventArgs
+public sealed class UntypedDataChangedEventArgs : DataManagerEventArgs
 {
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedDataValueEventArgs"/> class
+	/// Initializes a new instance of the <see cref="UntypedDataChangedEventArgs"/> class
 	/// (for internal use only, not synchronized).<br/>
-	/// This constructor is used when notifying event recipients about subsequent changes to the data value.
+	/// This constructor is used when notifying event recipients about subsequent changes to the data value reference.
 	/// </summary>
-	/// <param name="dataValue">Data value that has changed.</param>
+	/// <param name="data">Data value reference that has changed.</param>
 	/// <param name="changedFlags">Changed flags indicating what properties have changed.</param>
-	internal UntypedDataValueEventArgs(IUntypedDataValueInternal dataValue, DataValueChangedFlags changedFlags)
+	internal UntypedDataChangedEventArgs(IUntypedDataInternal data, DataChangedFlags changedFlags)
 	{
-		Debug.Assert(Monitor.IsEntered(dataValue.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+		Debug.Assert(Monitor.IsEntered(data.RootNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
-		mSnapshot = new UntypedDataValueSnapshot(dataValue);
-		mDataValue = dataValue;
+		mSnapshot = new UntypedDataSnapshot(data);
+		mData = data;
 		ChangedFlags = changedFlags;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedDataValueEventArgs"/> class copying another instance.
+	/// Initializes a new instance of the <see cref="UntypedDataChangedEventArgs"/> class copying another instance.
 	/// </summary>
 	/// <param name="other">Event arguments to copy.</param>
-	private UntypedDataValueEventArgs(UntypedDataValueEventArgs other)
+	private UntypedDataChangedEventArgs(UntypedDataChangedEventArgs other)
 	{
-		mSnapshot = new UntypedDataValueSnapshot(other.mSnapshot);
-		mDataValue = other.mDataValue;
+		mSnapshot = new UntypedDataSnapshot(other.mSnapshot);
+		mData = other.mData;
 		ChangedFlags = other.ChangedFlags;
 	}
 
 	#region DataValue
 
-	private readonly IUntypedDataValueInternal mDataValue;
+	private readonly IUntypedDataInternal mData;
 
 	/// <summary>
-	/// Gets the data value that has changed.<br/>
-	/// The data value will always return the latest value and properties, while the <see cref="Snapshot"/>
-	/// property provides a snapshot of the data value just after the change the event notifies about.
+	/// Gets the data value reference that has changed.<br/>
+	/// The data value reference will always return the latest value and properties, while the <see cref="Snapshot"/>
+	/// property provides a snapshot of the data value reference just after the change the event notifies about.
 	/// </summary>
-	public IUntypedDataValue DataValue => mDataValue;
+	public IUntypedData Data => mData;
 
 	#endregion
 
 	#region Snapshot
 
-	private bool                     mIsSnapshotValid;
-	private UntypedDataValueSnapshot mSnapshot;
+	private bool                mIsSnapshotValid;
+	private UntypedDataSnapshot mSnapshot;
 
 	/// <summary>
-	/// Gets the snapshot of <see cref="DataValue"/> just after the data value has changed.
+	/// Gets the snapshot of <see cref="Data"/> just after the data value has changed.
 	/// </summary>
-	public UntypedDataValueSnapshot Snapshot
+	public UntypedDataSnapshot Snapshot
 	{
 		get
 		{
@@ -71,7 +71,7 @@ public sealed class UntypedDataValueEventArgs : DataManagerEventArgs
 
 			// the snapshot still contains the original value instance that must not leave the data tree
 			// => copy the internal value outside the lock to reduce lock contention
-			object copy = mDataValue.DataTreeManager.Serializer.CopySerializableValue(mSnapshot.Value);
+			object copy = mData.RootNode.DataTreeManager.Serializer.CopySerializableValue(mSnapshot.Value);
 
 			lock (Sync)
 			{
@@ -91,7 +91,7 @@ public sealed class UntypedDataValueEventArgs : DataManagerEventArgs
 	/// <summary>
 	/// Gets the flags indicating what properties have changed.
 	/// </summary>
-	public DataValueChangedFlags ChangedFlags { get; }
+	public DataChangedFlags ChangedFlags { get; }
 
 	#endregion
 
@@ -103,7 +103,7 @@ public sealed class UntypedDataValueEventArgs : DataManagerEventArgs
 		var copies = new DataManagerEventArgs[count];
 		for (int i = 0; i < count; i++)
 		{
-			copies[i] = new UntypedDataValueEventArgs(this);
+			copies[i] = new UntypedDataChangedEventArgs(this);
 		}
 
 		return copies;

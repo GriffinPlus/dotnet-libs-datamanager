@@ -6,43 +6,45 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace GriffinPlus.Lib.DataManager.Viewer;
+namespace GriffinPlus.Lib.DataManager;
 
 /// <summary>
-/// Event arguments for events concerning a single <see cref="ViewerDataValue{T}"/> in the data manager.
+/// Event arguments for events concerning a single <see cref="DataValue{T}"/> in the data manager.
 /// </summary>
-public sealed class ViewerDataValueEventArgs<T> : DataManagerEventArgs
+public sealed class DataValueChangedEventArgs<T> : DataManagerEventArgs
 {
 	#region Construction
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="ViewerDataValueEventArgs{T}"/> class
+	/// Initializes a new instance of the <see cref="DataValueChangedEventArgs{T}"/> class
 	/// (for internal use only, not synchronized).<br/>
 	/// This constructor is used when notifying event recipients about subsequent changes to the data value.
 	/// </summary>
 	/// <param name="dataValue">Data value that has changed.</param>
 	/// <param name="changedFlags">Changed flags indicating what properties have changed.</param>
-	internal ViewerDataValueEventArgs(DataValue<T> dataValue, ViewerDataValueChangedFlags changedFlags)
+	internal DataValueChangedEventArgs(DataValue<T> dataValue, DataValueChangedFlags changedFlags)
 	{
 		Debug.Assert(Monitor.IsEntered(dataValue.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
-		mSnapshot = new ViewerDataValueSnapshot<T>(dataValue);
-		DataValue = dataValue.ViewerWrapper;
+		mSnapshot = new DataValueSnapshot<T>(dataValue);
+		DataValue = dataValue;
 		ChangedFlags = changedFlags;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="ViewerDataValueEventArgs{T}"/> class copying another instance.
+	/// Initializes a new instance of the <see cref="DataValueChangedEventArgs{T}"/> class copying another instance.
 	/// </summary>
 	/// <param name="other">Event arguments to copy.</param>
-	private ViewerDataValueEventArgs(ViewerDataValueEventArgs<T> other)
+	private DataValueChangedEventArgs(DataValueChangedEventArgs<T> other)
 	{
-		mSnapshot = new ViewerDataValueSnapshot<T>(other.mSnapshot);
+		mSnapshot = new DataValueSnapshot<T>(other.mSnapshot);
 		DataValue = other.DataValue;
 		ChangedFlags = other.ChangedFlags;
 	}
 
 	#endregion
+
+	#region Properties
 
 	#region DataValue
 
@@ -51,19 +53,19 @@ public sealed class ViewerDataValueEventArgs<T> : DataManagerEventArgs
 	/// The data value will always return the latest value and properties, while the <see cref="Snapshot"/>
 	/// property provides a snapshot of the data value just after the change the event notifies about.
 	/// </summary>
-	public ViewerDataValue<T> DataValue { get; }
+	public DataValue<T> DataValue { get; }
 
 	#endregion
 
 	#region Snapshot
 
-	private bool                       mIsSnapshotValid;
-	private ViewerDataValueSnapshot<T> mSnapshot;
+	private bool                 mIsSnapshotValid;
+	private DataValueSnapshot<T> mSnapshot;
 
 	/// <summary>
 	/// Gets the snapshot of <see cref="DataValue"/> just after the data value has changed.
 	/// </summary>
-	public ViewerDataValueSnapshot<T> Snapshot
+	public DataValueSnapshot<T> Snapshot
 	{
 		get
 		{
@@ -93,7 +95,9 @@ public sealed class ViewerDataValueEventArgs<T> : DataManagerEventArgs
 	/// <summary>
 	/// Gets the flags indicating what properties have changed.
 	/// </summary>
-	public ViewerDataValueChangedFlags ChangedFlags { get; }
+	public DataValueChangedFlags ChangedFlags { get; }
+
+	#endregion
 
 	#endregion
 
@@ -105,7 +109,7 @@ public sealed class ViewerDataValueEventArgs<T> : DataManagerEventArgs
 		var copies = new DataManagerEventArgs[count];
 		for (int i = 0; i < count; i++)
 		{
-			copies[i] = new ViewerDataValueEventArgs<T>(this);
+			copies[i] = new DataValueChangedEventArgs<T>(this);
 		}
 
 		return copies;

@@ -9,36 +9,36 @@ using System.Threading;
 namespace GriffinPlus.Lib.DataManager.Viewer;
 
 /// <summary>
-/// Event arguments for events concerning a single <see cref="IUntypedViewerDataValue"/> in the data manager.
+/// Event arguments for events concerning a single <see cref="ViewerDataValue{T}"/> in the data manager.
 /// </summary>
-public sealed class UntypedViewerDataValueEventArgs : DataManagerEventArgs
+public sealed class ViewerDataValueChangedEventArgs<T> : DataManagerEventArgs
 {
 	#region Construction
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedViewerDataValueEventArgs"/> class
+	/// Initializes a new instance of the <see cref="ViewerDataValueChangedEventArgs{T}"/> class
 	/// (for internal use only, not synchronized).<br/>
 	/// This constructor is used when notifying event recipients about subsequent changes to the data value.
 	/// </summary>
 	/// <param name="dataValue">Data value that has changed.</param>
 	/// <param name="changedFlags">Changed flags indicating what properties have changed.</param>
-	internal UntypedViewerDataValueEventArgs(IUntypedDataValueInternal dataValue, ViewerDataValueChangedFlags changedFlags)
+	internal ViewerDataValueChangedEventArgs(DataValue<T> dataValue, ViewerDataValueChangedFlags changedFlags)
 	{
 		Debug.Assert(Monitor.IsEntered(dataValue.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
-		mSnapshot = new UntypedViewerDataValueSnapshot(dataValue);
-		mDataValue = dataValue;
+		mSnapshot = new ViewerDataValueSnapshot<T>(dataValue);
+		DataValue = dataValue.ViewerWrapper;
 		ChangedFlags = changedFlags;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedViewerDataValueEventArgs"/> class copying another instance.
+	/// Initializes a new instance of the <see cref="ViewerDataValueChangedEventArgs{T}"/> class copying another instance.
 	/// </summary>
 	/// <param name="other">Event arguments to copy.</param>
-	private UntypedViewerDataValueEventArgs(UntypedViewerDataValueEventArgs other)
+	private ViewerDataValueChangedEventArgs(ViewerDataValueChangedEventArgs<T> other)
 	{
-		mSnapshot = new UntypedViewerDataValueSnapshot(other.mSnapshot);
-		mDataValue = other.mDataValue;
+		mSnapshot = new ViewerDataValueSnapshot<T>(other.mSnapshot);
+		DataValue = other.DataValue;
 		ChangedFlags = other.ChangedFlags;
 	}
 
@@ -46,26 +46,24 @@ public sealed class UntypedViewerDataValueEventArgs : DataManagerEventArgs
 
 	#region DataValue
 
-	private readonly IUntypedDataValueInternal mDataValue;
-
 	/// <summary>
 	/// Gets the data value that has changed.<br/>
 	/// The data value will always return the latest value and properties, while the <see cref="Snapshot"/>
 	/// property provides a snapshot of the data value just after the change the event notifies about.
 	/// </summary>
-	public IUntypedViewerDataValue DataValue => mDataValue.ViewerWrapper;
+	public ViewerDataValue<T> DataValue { get; }
 
 	#endregion
 
 	#region Snapshot
 
-	private bool                           mIsSnapshotValid;
-	private UntypedViewerDataValueSnapshot mSnapshot;
+	private bool                       mIsSnapshotValid;
+	private ViewerDataValueSnapshot<T> mSnapshot;
 
 	/// <summary>
 	/// Gets the snapshot of <see cref="DataValue"/> just after the data value has changed.
 	/// </summary>
-	public UntypedViewerDataValueSnapshot Snapshot
+	public ViewerDataValueSnapshot<T> Snapshot
 	{
 		get
 		{
@@ -75,7 +73,7 @@ public sealed class UntypedViewerDataValueEventArgs : DataManagerEventArgs
 
 			// the snapshot still contains the original value instance that must not leave the data tree
 			// => copy the internal value outside the lock to reduce lock contention
-			object copy = mDataValue.DataTreeManager.Serializer.CopySerializableValue(mSnapshot.Value);
+			T copy = DataValue.DataTreeManager.Serializer.CopySerializableValue(mSnapshot.Value);
 
 			lock (Sync)
 			{
@@ -107,7 +105,7 @@ public sealed class UntypedViewerDataValueEventArgs : DataManagerEventArgs
 		var copies = new DataManagerEventArgs[count];
 		for (int i = 0; i < count; i++)
 		{
-			copies[i] = new UntypedViewerDataValueEventArgs(this);
+			copies[i] = new ViewerDataValueChangedEventArgs<T>(this);
 		}
 
 		return copies;

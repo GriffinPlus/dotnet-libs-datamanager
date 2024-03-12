@@ -20,7 +20,7 @@ public interface IUntypedViewerDataValue
 	/// Event invocations will be scheduled using the <see cref="SynchronizationContext"/> of the registering thread, if available.<br/>
 	/// If the registering thread does not have a synchronization context, event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	event EventHandler<UntypedViewerDataValueEventArgs> UntypedChanged;
+	event EventHandler<UntypedViewerDataValueChangedEventArgs> UntypedChanged;
 
 	/// <summary>
 	/// Is called when something in the current data value changes.<br/>
@@ -28,7 +28,7 @@ public interface IUntypedViewerDataValue
 	/// Subsequent invocations notify about changes to the collection.<br/>
 	/// Event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	event EventHandler<UntypedViewerDataValueEventArgs> UntypedChangedAsync;
+	event EventHandler<UntypedViewerDataValueChangedEventArgs> UntypedChangedAsync;
 
 	/// <summary>
 	/// Gets the wrapped data value.

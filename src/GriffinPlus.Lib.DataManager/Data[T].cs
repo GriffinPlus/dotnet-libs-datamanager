@@ -26,7 +26,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	private const string UntypedChangedEventName = "UntypedChanged";
 
 	/// <inheritdoc cref="IUntypedData.UntypedChanged"/>
-	public event EventHandler<DataEventArgs<T>> Changed
+	public event EventHandler<DataChangedEventArgs<T>> Changed
 	{
 		add
 		{
@@ -35,7 +35,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDisposed)
 					throw new ObjectDisposedException(null);
 
-				EventManager<DataEventArgs<T>>.RegisterEventHandler(
+				EventManager<DataChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ChangedEventName,
 					value,
@@ -43,7 +43,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 					true,
 					true,
 					this,
-					new DataEventArgs<T>(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
+					new DataChangedEventArgs<T>(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
 			}
 		}
 
@@ -52,13 +52,13 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 			lock (RootNode.DataTreeManager.Sync)
 			{
 				if (mDisposed) throw new ObjectDisposedException(null);
-				EventManager<DataEventArgs<T>>.UnregisterEventHandler(this, ChangedEventName, value);
+				EventManager<DataChangedEventArgs<T>>.UnregisterEventHandler(this, ChangedEventName, value);
 			}
 		}
 	}
 
 	/// <inheritdoc cref="IUntypedData.UntypedChangedAsync"/>
-	public event EventHandler<DataEventArgs<T>> ChangedAsync
+	public event EventHandler<DataChangedEventArgs<T>> ChangedAsync
 	{
 		add
 		{
@@ -67,7 +67,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDisposed)
 					throw new ObjectDisposedException(null);
 
-				EventManager<DataEventArgs<T>>.RegisterEventHandler(
+				EventManager<DataChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ChangedEventName,
 					value,
@@ -75,7 +75,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 					true,
 					true,
 					this,
-					new DataEventArgs<T>(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
+					new DataChangedEventArgs<T>(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
 			}
 		}
 
@@ -84,13 +84,13 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 			lock (RootNode.DataTreeManager.Sync)
 			{
 				if (mDisposed) throw new ObjectDisposedException(null);
-				EventManager<DataEventArgs<T>>.UnregisterEventHandler(this, ChangedEventName, value);
+				EventManager<DataChangedEventArgs<T>>.UnregisterEventHandler(this, ChangedEventName, value);
 			}
 		}
 	}
 
 	/// <inheritdoc/>
-	public event EventHandler<UntypedDataEventArgs> UntypedChanged
+	public event EventHandler<UntypedDataChangedEventArgs> UntypedChanged
 	{
 		add
 		{
@@ -99,7 +99,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDisposed)
 					throw new ObjectDisposedException(null);
 
-				EventManager<UntypedDataEventArgs>.RegisterEventHandler(
+				EventManager<UntypedDataChangedEventArgs>.RegisterEventHandler(
 					this,
 					UntypedChangedEventName,
 					value,
@@ -107,7 +107,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 					true,
 					true,
 					this,
-					new UntypedDataEventArgs(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
+					new UntypedDataChangedEventArgs(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
 			}
 		}
 
@@ -116,13 +116,13 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 			lock (RootNode.DataTreeManager.Sync)
 			{
 				if (mDisposed) throw new ObjectDisposedException(null);
-				EventManager<UntypedDataEventArgs>.UnregisterEventHandler(this, UntypedChangedEventName, value);
+				EventManager<UntypedDataChangedEventArgs>.UnregisterEventHandler(this, UntypedChangedEventName, value);
 			}
 		}
 	}
 
 	/// <inheritdoc/>
-	public event EventHandler<UntypedDataEventArgs> UntypedChangedAsync
+	public event EventHandler<UntypedDataChangedEventArgs> UntypedChangedAsync
 	{
 		add
 		{
@@ -131,7 +131,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDisposed)
 					throw new ObjectDisposedException(null);
 
-				EventManager<UntypedDataEventArgs>.RegisterEventHandler(
+				EventManager<UntypedDataChangedEventArgs>.RegisterEventHandler(
 					this,
 					UntypedChangedEventName,
 					value,
@@ -139,7 +139,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 					true,
 					true,
 					this,
-					new UntypedDataEventArgs(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
+					new UntypedDataChangedEventArgs(this, DataChangedFlags.All | DataChangedFlags.InitialUpdate));
 			}
 		}
 
@@ -148,7 +148,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 			lock (RootNode.DataTreeManager.Sync)
 			{
 				if (mDisposed) throw new ObjectDisposedException(null);
-				EventManager<UntypedDataEventArgs>.UnregisterEventHandler(this, UntypedChangedEventName, value);
+				EventManager<UntypedDataChangedEventArgs>.UnregisterEventHandler(this, UntypedChangedEventName, value);
 			}
 		}
 	}
@@ -170,25 +170,25 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 		mValue = mDataValue.ValueUnsynced;
 
 		// raise the 'Changed' event, if necessary
-		if (EventManager<DataEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
+		if (EventManager<DataChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
-			EventManager<DataEventArgs<T>>.FireEvent(
+			EventManager<DataChangedEventArgs<T>>.FireEvent(
 				this,
 				ChangedEventName,
 				this,
-				new DataEventArgs<T>(
+				new DataChangedEventArgs<T>(
 					this,
 					(DataChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
 
 		// raise the 'UntypedChanged' event, if necessary
-		if (EventManager<UntypedDataEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
+		if (EventManager<UntypedDataChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
-			EventManager<UntypedDataEventArgs>.FireEvent(
+			EventManager<UntypedDataChangedEventArgs>.FireEvent(
 				this,
 				UntypedChangedEventName,
 				this,
-				new UntypedDataEventArgs(
+				new UntypedDataChangedEventArgs(
 					this,
 					(DataChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
@@ -757,23 +757,23 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	private void RaiseChangedEvents(DataChangedFlags changedFlags)
 	{
 		// raise 'Changed' event
-		if (EventManager<DataEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
+		if (EventManager<DataChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
-			EventManager<DataEventArgs<T>>.FireEvent(
+			EventManager<DataChangedEventArgs<T>>.FireEvent(
 				this,
 				ChangedEventName,
 				mDataValue,
-				new DataEventArgs<T>(this, changedFlags));
+				new DataChangedEventArgs<T>(this, changedFlags));
 		}
 
 		// raise 'UntypedChanged' event
-		if (EventManager<UntypedDataEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
+		if (EventManager<UntypedDataChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
-			EventManager<UntypedDataEventArgs>.FireEvent(
+			EventManager<UntypedDataChangedEventArgs>.FireEvent(
 				this,
 				UntypedChangedEventName,
 				mDataValue,
-				new UntypedDataEventArgs(this, changedFlags));
+				new UntypedDataChangedEventArgs(this, changedFlags));
 		}
 	}
 

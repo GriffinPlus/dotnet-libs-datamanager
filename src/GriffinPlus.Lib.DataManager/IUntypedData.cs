@@ -21,7 +21,7 @@ public interface IUntypedData
 	/// If the registering thread does not have a synchronization context, event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
 	/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-	event EventHandler<UntypedDataEventArgs> UntypedChanged;
+	event EventHandler<UntypedDataChangedEventArgs> UntypedChanged;
 
 	/// <summary>
 	/// Occurs when the data value reference changes.<br/>
@@ -30,7 +30,7 @@ public interface IUntypedData
 	/// Event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
 	/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-	event EventHandler<UntypedDataEventArgs> UntypedChangedAsync;
+	event EventHandler<UntypedDataChangedEventArgs> UntypedChangedAsync;
 
 	/// <summary>
 	/// Gets the root node of the tree the referenced data value resides in.

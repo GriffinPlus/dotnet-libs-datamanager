@@ -30,13 +30,13 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	internal const string UntypedChangedEventName = "UntypedChanged";
 
 	/// <inheritdoc/>
-	public event EventHandler<UntypedDataValueEventArgs> UntypedChanged
+	public event EventHandler<UntypedDataValueChangedEventArgs> UntypedChanged
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event of the data value
 			{
-				EventManager<UntypedDataValueEventArgs>.RegisterEventHandler(
+				EventManager<UntypedDataValueChangedEventArgs>.RegisterEventHandler(
 					this,
 					UntypedChangedEventName,
 					value,
@@ -44,24 +44,24 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					true,
 					true,
 					this,
-					new UntypedDataValueEventArgs(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
+					new UntypedDataValueChangedEventArgs(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<UntypedDataValueEventArgs>.UnregisterEventHandler(
+		remove => EventManager<UntypedDataValueChangedEventArgs>.UnregisterEventHandler(
 			this,
 			UntypedChangedEventName,
 			value);
 	}
 
 	/// <inheritdoc/>
-	public event EventHandler<UntypedDataValueEventArgs> UntypedChangedAsync
+	public event EventHandler<UntypedDataValueChangedEventArgs> UntypedChangedAsync
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event of the data value
 			{
-				EventManager<UntypedDataValueEventArgs>.RegisterEventHandler(
+				EventManager<UntypedDataValueChangedEventArgs>.RegisterEventHandler(
 					this,
 					UntypedChangedEventName,
 					value,
@@ -69,11 +69,11 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					true,
 					true,
 					this,
-					new UntypedDataValueEventArgs(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
+					new UntypedDataValueChangedEventArgs(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<UntypedDataValueEventArgs>.UnregisterEventHandler(
+		remove => EventManager<UntypedDataValueChangedEventArgs>.UnregisterEventHandler(
 			this,
 			UntypedChangedEventName,
 			value);
@@ -86,13 +86,13 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	internal const string ChangedEventName = "Changed";
 
 	/// <inheritdoc cref="UntypedChanged"/>
-	public event EventHandler<DataValueEventArgs<T>> Changed
+	public event EventHandler<DataValueChangedEventArgs<T>> Changed
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event of the data value
 			{
-				EventManager<DataValueEventArgs<T>>.RegisterEventHandler(
+				EventManager<DataValueChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ChangedEventName,
 					value,
@@ -100,24 +100,24 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					true,
 					true,
 					this,
-					new DataValueEventArgs<T>(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
+					new DataValueChangedEventArgs<T>(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<DataValueEventArgs<T>>.UnregisterEventHandler(
+		remove => EventManager<DataValueChangedEventArgs<T>>.UnregisterEventHandler(
 			this,
 			ChangedEventName,
 			value);
 	}
 
 	/// <inheritdoc cref="IUntypedDataValue.UntypedChangedAsync"/>
-	public event EventHandler<DataValueEventArgs<T>> ChangedAsync
+	public event EventHandler<DataValueChangedEventArgs<T>> ChangedAsync
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event of the data value
 			{
-				EventManager<DataValueEventArgs<T>>.RegisterEventHandler(
+				EventManager<DataValueChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ChangedEventName,
 					value,
@@ -125,11 +125,11 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					true,
 					true,
 					this,
-					new DataValueEventArgs<T>(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
+					new DataValueChangedEventArgs<T>(this, DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<DataValueEventArgs<T>>.UnregisterEventHandler(
+		remove => EventManager<DataValueChangedEventArgs<T>>.UnregisterEventHandler(
 			this,
 			ChangedEventName,
 			value);
@@ -186,26 +186,26 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		}
 
 		// raise 'Changed' event
-		if (EventManager<DataValueEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
+		if (EventManager<DataValueChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
-			EventManager<DataValueEventArgs<T>>.FireEvent(
+			EventManager<DataValueChangedEventArgs<T>>.FireEvent(
 				this,
 				ChangedEventName,
 				this,
-				new DataValueEventArgs<T>(
+				new DataValueChangedEventArgs<T>(
 					this,
 					(DataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
 
 		// raise 'UntypedChanged' event
 		// ReSharper disable once InvertIf
-		if (EventManager<UntypedDataValueEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
+		if (EventManager<UntypedDataValueChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
-			EventManager<UntypedDataValueEventArgs>.FireEvent(
+			EventManager<UntypedDataValueChangedEventArgs>.FireEvent(
 				this,
 				UntypedChangedEventName,
 				this,
-				new UntypedDataValueEventArgs(
+				new UntypedDataValueChangedEventArgs(
 					this,
 					(DataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}

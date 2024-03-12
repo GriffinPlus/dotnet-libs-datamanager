@@ -20,7 +20,7 @@ public interface IUntypedDataValue
 	/// Event invocations will be scheduled using the <see cref="SynchronizationContext"/> of the registering thread, if available.<br/>
 	/// If the registering thread does not have a synchronization context, event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	event EventHandler<UntypedDataValueEventArgs> UntypedChanged;
+	event EventHandler<UntypedDataValueChangedEventArgs> UntypedChanged;
 
 	/// <summary>
 	/// Is called when something in the current data value changes.<br/>
@@ -28,7 +28,7 @@ public interface IUntypedDataValue
 	/// Subsequent invocations notify about changes to the collection.<br/>
 	/// Event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	event EventHandler<UntypedDataValueEventArgs> UntypedChangedAsync;
+	event EventHandler<UntypedDataValueChangedEventArgs> UntypedChangedAsync;
 
 	/// <summary>
 	/// Gets the data tree manager that is responsible for the data tree the data value belongs to.

@@ -27,28 +27,28 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	}
 
 	/// <inheritdoc cref="DataValue{T}.ViewerChanged"/>
-	public event EventHandler<ViewerDataValueEventArgs<T>> Changed
+	public event EventHandler<ViewerDataValueChangedEventArgs<T>> Changed
 	{
 		add => WrappedValue.ViewerChanged += value;
 		remove => WrappedValue.ViewerChanged -= value;
 	}
 
 	/// <inheritdoc cref="DataValue{T}.ViewerChangedAsync"/>
-	public event EventHandler<ViewerDataValueEventArgs<T>> ChangedAsync
+	public event EventHandler<ViewerDataValueChangedEventArgs<T>> ChangedAsync
 	{
 		add => WrappedValue.ViewerChangedAsync += value;
 		remove => WrappedValue.ViewerChangedAsync -= value;
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.UntypedChanged"/>
-	event EventHandler<UntypedViewerDataValueEventArgs> IUntypedViewerDataValue.UntypedChanged
+	event EventHandler<UntypedViewerDataValueChangedEventArgs> IUntypedViewerDataValue.UntypedChanged
 	{
 		add => WrappedValue.ViewerUntypedChanged += value;
 		remove => WrappedValue.ViewerUntypedChanged -= value;
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.UntypedChangedAsync"/>
-	event EventHandler<UntypedViewerDataValueEventArgs> IUntypedViewerDataValue.UntypedChangedAsync
+	event EventHandler<UntypedViewerDataValueChangedEventArgs> IUntypedViewerDataValue.UntypedChangedAsync
 	{
 		add => WrappedValue.ViewerUntypedChangedAsync += value;
 		remove => WrappedValue.ViewerUntypedChangedAsync -= value;

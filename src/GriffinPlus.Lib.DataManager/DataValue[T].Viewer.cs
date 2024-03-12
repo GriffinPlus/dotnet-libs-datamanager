@@ -24,13 +24,13 @@ partial class DataValue<T>
 	/// Event invocations will be scheduled using the <see cref="SynchronizationContext"/> of the registering thread, if available.<br/>
 	/// If the registering thread does not have a synchronization context, event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	internal event EventHandler<ViewerDataValueEventArgs<T>> ViewerChanged
+	internal event EventHandler<ViewerDataValueChangedEventArgs<T>> ViewerChanged
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event that keeps track of changes
 			{
-				EventManager<ViewerDataValueEventArgs<T>>.RegisterEventHandler(
+				EventManager<ViewerDataValueChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ViewerChangedEventName,
 					value,
@@ -38,11 +38,11 @@ partial class DataValue<T>
 					true,
 					true,
 					this,
-					new ViewerDataValueEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
+					new ViewerDataValueChangedEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<ViewerDataValueEventArgs<T>>.UnregisterEventHandler(
+		remove => EventManager<ViewerDataValueChangedEventArgs<T>>.UnregisterEventHandler(
 			this,
 			ViewerChangedEventName,
 			value);
@@ -54,13 +54,13 @@ partial class DataValue<T>
 	/// Subsequent invocations notify about changes to the collection.<br/>
 	/// Event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	internal event EventHandler<ViewerDataValueEventArgs<T>> ViewerChangedAsync
+	internal event EventHandler<ViewerDataValueChangedEventArgs<T>> ViewerChangedAsync
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event that keeps track of changes
 			{
-				EventManager<ViewerDataValueEventArgs<T>>.RegisterEventHandler(
+				EventManager<ViewerDataValueChangedEventArgs<T>>.RegisterEventHandler(
 					this,
 					ViewerChangedEventName,
 					value,
@@ -68,11 +68,11 @@ partial class DataValue<T>
 					true,
 					true,
 					this,
-					new ViewerDataValueEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
+					new ViewerDataValueChangedEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<ViewerDataValueEventArgs<T>>.UnregisterEventHandler(
+		remove => EventManager<ViewerDataValueChangedEventArgs<T>>.UnregisterEventHandler(
 			this,
 			ViewerChangedEventName,
 			value);
@@ -91,13 +91,13 @@ partial class DataValue<T>
 	/// Event invocations will be scheduled using the <see cref="SynchronizationContext"/> of the registering thread, if available.<br/>
 	/// If the registering thread does not have a synchronization context, event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	internal event EventHandler<UntypedViewerDataValueEventArgs> ViewerUntypedChanged
+	internal event EventHandler<UntypedViewerDataValueChangedEventArgs> ViewerUntypedChanged
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event that keeps track of changes
 			{
-				EventManager<UntypedViewerDataValueEventArgs>.RegisterEventHandler(
+				EventManager<UntypedViewerDataValueChangedEventArgs>.RegisterEventHandler(
 					this,
 					ViewerUntypedChangedEventName,
 					value,
@@ -105,11 +105,11 @@ partial class DataValue<T>
 					true,
 					true,
 					this,
-					new UntypedViewerDataValueEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
+					new UntypedViewerDataValueChangedEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<UntypedViewerDataValueEventArgs>.UnregisterEventHandler(
+		remove => EventManager<UntypedViewerDataValueChangedEventArgs>.UnregisterEventHandler(
 			this,
 			ViewerUntypedChangedEventName,
 			value);
@@ -121,13 +121,13 @@ partial class DataValue<T>
 	/// Subsequent invocations notify about changes to the collection.<br/>
 	/// Event invocations will be scheduled on the data tree manager thread.
 	/// </summary>
-	internal event EventHandler<UntypedViewerDataValueEventArgs> ViewerUntypedChangedAsync
+	internal event EventHandler<UntypedViewerDataValueChangedEventArgs> ViewerUntypedChangedAsync
 	{
 		add
 		{
 			lock (DataTreeManager.Sync) // ensures that nothing can get in between getting the initial state and registering the event that keeps track of changes
 			{
-				EventManager<UntypedViewerDataValueEventArgs>.RegisterEventHandler(
+				EventManager<UntypedViewerDataValueChangedEventArgs>.RegisterEventHandler(
 					this,
 					ViewerUntypedChangedEventName,
 					value,
@@ -135,11 +135,11 @@ partial class DataValue<T>
 					true,
 					true,
 					this,
-					new UntypedViewerDataValueEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
+					new UntypedViewerDataValueChangedEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
 
-		remove => EventManager<UntypedViewerDataValueEventArgs>.UnregisterEventHandler(
+		remove => EventManager<UntypedViewerDataValueChangedEventArgs>.UnregisterEventHandler(
 			this,
 			ViewerUntypedChangedEventName,
 			value);
