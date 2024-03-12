@@ -41,14 +41,14 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.UntypedChanged"/>
-	event EventHandler<UntypedViewerDataValueChangedEventArgs> IUntypedViewerDataValue.UntypedChanged
+	public event EventHandler<UntypedViewerDataValueChangedEventArgs> UntypedChanged
 	{
 		add => WrappedValue.ViewerUntypedChanged += value;
 		remove => WrappedValue.ViewerUntypedChanged -= value;
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.UntypedChangedAsync"/>
-	event EventHandler<UntypedViewerDataValueChangedEventArgs> IUntypedViewerDataValue.UntypedChangedAsync
+	public event EventHandler<UntypedViewerDataValueChangedEventArgs> UntypedChangedAsync
 	{
 		add => WrappedValue.ViewerUntypedChangedAsync += value;
 		remove => WrappedValue.ViewerUntypedChangedAsync -= value;
