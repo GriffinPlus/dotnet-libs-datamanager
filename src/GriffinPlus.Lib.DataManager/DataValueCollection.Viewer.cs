@@ -43,7 +43,7 @@ partial class DataValueCollection
 					SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataValueCollectionChangedEventArgs(mNode, mBuffer));
 			}
 		}
@@ -73,7 +73,7 @@ partial class DataValueCollection
 					mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataValueCollectionChangedEventArgs(mNode, mBuffer));
 			}
 		}
