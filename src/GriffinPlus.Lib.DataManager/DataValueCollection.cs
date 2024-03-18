@@ -401,11 +401,13 @@ public partial class DataValueCollection :
 	/// <param name="name">Name of the data value.</param>
 	/// <param name="properties">Initial properties of the data value.</param>
 	/// <param name="value">Initial value.</param>
+	/// <param name="timestamp">UTC-Timestamp of the data value (<c>null</c>> to use <see cref="DateTime.UtcNow"/>).</param>
 	/// <returns>The added data value.</returns>
 	internal DataValue<T> AddInternalUnsynced<T>(
 		ReadOnlySpan<char>          name,
 		DataValuePropertiesInternal properties,
-		T                           value)
+		T                           value,
+		DateTime?                   timestamp = null)
 	{
 		Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -419,7 +421,7 @@ public partial class DataValueCollection :
 			}
 		}
 
-		var dataValue = new DataValue<T>(mNode, name, properties, value); // value is not copied!
+		var dataValue = new DataValue<T>(mNode, name, properties, value, timestamp); // value is not copied!
 		mBuffer.Add(dataValue);
 
 		// raise 'Changed' event, if the added value is regular

@@ -222,11 +222,13 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	/// <param name="name">Name of the data value</param>
 	/// <param name="properties">Properties of the data value.</param>
 	/// <param name="value">The value of the data value.</param>
+	/// <param name="timestamp">UTC-Timestamp of the data value (<c>null</c>> to use <see cref="DateTime.UtcNow"/>).</param>
 	internal DataValue(
 		DataNode                    parentNode,
 		ReadOnlySpan<char>          name,
 		DataValuePropertiesInternal properties,
-		T                           value)
+		T                           value,
+		DateTime?                   timestamp = null)
 	{
 		// tree sync should be locked here...
 		Debug.Assert(parentNode != null, "The parent node is not specified.");
@@ -236,7 +238,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		mParentNode = parentNode;
 		mName = name.ToString();
 		mPath = PathHelpers.AppendNameToPath(mParentNode.PathUnsynced, name);
-		mTimestamp = DateTime.UtcNow;
+		mTimestamp = timestamp ?? DateTime.UtcNow;
 		mProperties = properties;
 		mValue = value;
 
