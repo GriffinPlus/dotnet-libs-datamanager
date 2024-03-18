@@ -37,7 +37,7 @@ partial class DataValue<T>
 					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataValueChangedEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
@@ -67,7 +67,7 @@ partial class DataValue<T>
 					DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataValueChangedEventArgs<T>(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
@@ -104,7 +104,7 @@ partial class DataValue<T>
 					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new UntypedViewerDataValueChangedEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
@@ -134,7 +134,7 @@ partial class DataValue<T>
 					DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new UntypedViewerDataValueChangedEventArgs(this, ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate));
 			}
 		}
