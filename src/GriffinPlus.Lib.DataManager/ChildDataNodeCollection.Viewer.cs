@@ -40,7 +40,7 @@ sealed partial class ChildDataNodeCollection
 					SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataNodeCollectionChangedEventArgs(mNode.ViewerWrapper, mBuffer));
 			}
 		}
@@ -70,7 +70,7 @@ sealed partial class ChildDataNodeCollection
 					mNode.DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataNodeCollectionChangedEventArgs(mNode.ViewerWrapper, mBuffer));
 			}
 		}
