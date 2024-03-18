@@ -21,6 +21,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// A node in the data tree.
 /// </summary>
 [InternalObjectSerializer(1)]
+[DebuggerDisplay("DataNode => Name: {" + nameof(Name) + "}, Properties: {"  + nameof(Properties) + "}, Path: {"  + nameof(Path) + "}")]
 public partial class DataNode : IInternalObjectSerializer
 {
 	#region Changed
@@ -1736,22 +1737,6 @@ public partial class DataNode : IInternalObjectSerializer
 			});
 
 		return count;
-	}
-
-	#endregion
-
-	#region Overrides
-
-	/// <summary>
-	/// Gets a string representation of the current data node.
-	/// </summary>
-	/// <returns>String representation of the current data node.</returns>
-	public override string ToString()
-	{
-		lock (DataTreeManager.Sync)
-		{
-			return $"Name: {mName}, Properties: {mProperties}, Path: {mPath}";
-		}
 	}
 
 	#endregion

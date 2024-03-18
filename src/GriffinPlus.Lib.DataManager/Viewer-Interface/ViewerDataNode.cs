@@ -4,6 +4,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Diagnostics;
 
 namespace GriffinPlus.Lib.DataManager.Viewer;
 
@@ -15,6 +16,7 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// which is important for viewers to show the correct state of the data tree - with regular and dummy data.
 /// Modifying operations do not affect dummy nodes as dummy nodes are managed by the data tree manager.
 /// </remarks>
+[DebuggerDisplay("ViewerDataNode => Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
 public sealed class ViewerDataNode
 {
 	/// <summary>
