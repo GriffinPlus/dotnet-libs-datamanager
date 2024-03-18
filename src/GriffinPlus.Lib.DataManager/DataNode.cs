@@ -384,35 +384,50 @@ public partial class DataNode : IInternalObjectSerializer
 				if (mParent?.Children.GetByNameUnsynced(value) != null)
 					throw new DataNodeExistsAlreadyException($"A node with the same name ({value}) does already exist at this level.");
 
-				// remove data value references from data values below that node
-				IUntypedDataInternal[] references = DataTreeManager.UnregisterDataValueReferencesBelowNodeUnsynced(this, true);
 
 				// change the name and the resulting path and raise the appropriate events
+				// (the path only changes for nodes below the root node)
+				bool pathChanged = mParent != null;
 				mName = value;
-				mPath = mParent != null ? PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan()) : PathHelpers.RootPath;
+				mPath = pathChanged ? PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan()) : PathHelpers.RootPath;
+
+				// remove data value references from data values below that node, if the path has changed
+				IUntypedDataInternal[] references = null;
+				if (pathChanged) references = DataTreeManager.UnregisterDataValueReferencesBelowNodeUnsynced(this, true);
+
+				// raise 'Changed' event and 'ChangedAsync' event
 				if (EventManager<DataNodeChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 				{
+					var changedFlags = DataNodeChangedFlags.Name;
+					changedFlags |= pathChanged ? DataNodeChangedFlags.Path : DataNodeChangedFlags.None;
 					EventManager<DataNodeChangedEventArgs>.FireEvent(
 						this,
 						ChangedEventName,
 						this,
-						new DataNodeChangedEventArgs(this, DataNodeChangedFlags.Name | DataNodeChangedFlags.Path));
+						new DataNodeChangedEventArgs(this, changedFlags));
 				}
+
+				// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 				if (EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 				{
+					var changedFlags = ViewerDataNodeChangedFlags.Name;
+					changedFlags |= pathChanged ? ViewerDataNodeChangedFlags.Path : ViewerDataNodeChangedFlags.None;
 					EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
 						this,
 						ViewerChangedEventName,
-						this,
-						new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.Name | ViewerDataNodeChangedFlags.Path));
+						ViewerWrapper,
+						new ViewerDataNodeChangedEventArgs(this, changedFlags));
 				}
 
-				// change the path of all child nodes and data values
-				Children.ReinitializePathsRecursivelyUnsynced();
-				Values.ReinitializePathsRecursivelyUnsynced();
+				// adjust the path of all child nodes and data values, if the path has changed
+				if (pathChanged)
+				{
+					Children.ReinitializePathsRecursivelyUnsynced();
+					Values.ReinitializePathsRecursivelyUnsynced();
+				}
 
-				// update data value reference objects to point to the proper data values
-				DataTreeManager.RegisterDataValueReferencesUnsynced(references);
+				// update data value reference objects to point to the proper data values, if necessary
+				if (references != null) DataTreeManager.RegisterDataValueReferencesUnsynced(references);
 			}
 		}
 	}
