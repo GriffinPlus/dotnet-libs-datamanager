@@ -21,7 +21,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// A node in the data tree.
 /// </summary>
 [InternalObjectSerializer(1)]
-[DebuggerDisplay("DataNode => Name: {" + nameof(Name) + "}, Properties: {"  + nameof(Properties) + "}, Path: {"  + nameof(Path) + "}")]
+[DebuggerDisplay("DataNode => Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
 public partial class DataNode : IInternalObjectSerializer
 {
 	#region Changed
@@ -1772,7 +1772,7 @@ public partial class DataNode : IInternalObjectSerializer
 		EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
 			this,
 			ChangedEventName,
-			this,
+			ViewerWrapper,
 			new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.IsDummy));
 	}
 

@@ -37,7 +37,7 @@ partial class DataNode
 					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate));
 			}
 		}
@@ -67,7 +67,7 @@ partial class DataNode
 					DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
-					this,
+					ViewerWrapper,
 					new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate));
 			}
 		}
