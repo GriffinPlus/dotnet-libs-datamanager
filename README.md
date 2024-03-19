@@ -5,6 +5,12 @@
 [![NuGet Version](https://img.shields.io/nuget/v/GriffinPlus.Lib.DataManager.svg?label=NuGet%20Version)](https://www.nuget.org/packages/GriffinPlus.Lib.DataManager)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/GriffinPlus.Lib.DataManager.svg?label=NuGet%20Downloads)](https://www.nuget.org/packages/GriffinPlus.Lib.DataManager)
 
+## Project Status
+
+**The project is under development!**
+
+**Do not use it for productive systems.**
+
 ## Overview
 
 --- TODO ---
