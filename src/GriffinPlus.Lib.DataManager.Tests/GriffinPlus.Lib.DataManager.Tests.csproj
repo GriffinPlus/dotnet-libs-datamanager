@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net461; net48; netcoreapp2.2; netcoreapp3.1; net5.0; net6.0; net7.0; net8.0</TargetFrameworks>
@@ -22,7 +22,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-	
+
 	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.3" />
 		<PackageReference Include="xunit" Version="2.7.0" />

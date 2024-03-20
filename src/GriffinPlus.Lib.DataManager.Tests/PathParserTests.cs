@@ -177,11 +177,7 @@ public class PathParserTests
 	[MemberData(nameof(TestData_Invalid_ForCreate))]
 	public void Create_WithValidation_NOK(string path, bool isAbsolutePath)
 	{
-		Assert.Throws<ArgumentException>(
-			() =>
-			{
-				PathParser.Create(path.AsSpan(), true);
-			});
+		Assert.Throws<ArgumentException>(() => PathParser.Create(path.AsSpan(), true));
 	}
 
 	#endregion
