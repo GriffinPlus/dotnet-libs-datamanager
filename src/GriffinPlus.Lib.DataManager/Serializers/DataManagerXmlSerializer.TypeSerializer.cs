@@ -14,7 +14,7 @@ partial class DataManagerXmlSerializer
 	{
 		public readonly string                   Type;
 		public readonly TypeSerializerDelegate   SerializerCallback;
-		public readonly TypeDeserializerDelegate DeserializerCallback;
+		public readonly TypeDeserializerDelegate DeserializerCallback; // TODO: xml deserialization is still missing, will be used when it is added...
 		public readonly TypeCopierDelegate       CopierCallback;
 
 		/// <summary>
