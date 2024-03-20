@@ -18,26 +18,38 @@ enum DataNodePropertiesInternal
 	/// </summary>
 	None = DataValueProperties.None,
 
+	//
+	// user properties (mask: 0x000000FF)
+	//
+
 	/// <summary>
 	/// The data node is serialized when persisting.
 	/// </summary>
 	Persistent = DataNodeProperties.Persistent,
 
 	/// <summary>
-	/// Administrative Flag:
-	/// The data node is just a placeholder for a regular data node.
-	/// </summary>
-	Dummy = 0x00000010,
-
-	/// <summary>
 	/// All property flags that can be explicitly set by the user.
 	/// </summary>
 	UserProperties = Persistent,
+
+	//
+	// administrative properties (mask: 0x0000FF00)
+	//
+
+	/// <summary>
+	/// Administrative Flag:
+	/// The data node is just a placeholder for a regular data node.
+	/// </summary>
+	Dummy = 0x00000100,
 
 	/// <summary>
 	/// All property flags that are used for administrative purposes only and must not be explicitly set by the user.
 	/// </summary>
 	AdministrativeProperties = Dummy,
+
+	//
+	// other masks
+	//
 
 	/// <summary>
 	/// All property flags that might occur.

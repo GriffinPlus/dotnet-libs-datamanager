@@ -22,7 +22,7 @@ public enum ViewerDataValueChangedFlags
 	/// <summary>
 	/// Nothing has changed.
 	/// </summary>
-	None = 0x00000000,
+	None = DataValueChangedFlagsInternal.None,
 
 	/// <summary>
 	/// The <see cref="ViewerDataValue{T}.IsPersistent"/> property or the <see cref="IUntypedViewerDataValue.IsPersistent"/> property has changed.
@@ -42,25 +42,35 @@ public enum ViewerDataValueChangedFlags
 	/// <summary>
 	/// The <see cref="ViewerDataValue{T}.Properties"/> property or the <see cref="IUntypedViewerDataValue.Properties"/> property has changed.
 	/// </summary>
-	Properties = 0x00000100,
+	Properties = DataValueChangedFlagsInternal.Properties,
 
 	/// <summary>
 	/// The <see cref="ViewerDataValue{T}.Value"/> property or the <see cref="IUntypedViewerDataValue.Value"/> property has changed.
 	/// </summary>
-	Value = 0x00000200,
+	Value = DataValueChangedFlagsInternal.Value,
 
 	/// <summary>
 	/// The <see cref="ViewerDataValue{T}.Timestamp"/> property or the <see cref="IUntypedViewerDataValue.Timestamp"/> property has changed.
 	/// </summary>
-	Timestamp = 0x00000400,
+	Timestamp = DataValueChangedFlagsInternal.Timestamp,
+
+	/// <summary>
+	/// The <see cref="ViewerDataValue{T}.Name"/> property or the <see cref="IUntypedViewerDataValue.Name"/> property has changed.
+	/// </summary>
+	Name = DataValueChangedFlagsInternal.Name,
+
+	/// <summary>
+	/// The <see cref="ViewerDataValue{T}.Path"/> property or the <see cref="IUntypedViewerDataValue.Path"/> property has changed.
+	/// </summary>
+	Path = DataValueChangedFlagsInternal.Path,
 
 	/// <summary>
 	/// All flags (except <see cref="InitialUpdate"/>).
 	/// </summary>
-	All = IsPersistent | IsDummy | IsDetached | Properties | Value | Timestamp,
+	All = IsPersistent | IsDummy | IsDetached | Properties | Value | Timestamp | Name | Path,
 
 	/// <summary>
 	/// This flag indicates that this is the first update to a monitored data value.
 	/// </summary>
-	InitialUpdate = 0x00010000
+	InitialUpdate = DataValueChangedFlagsInternal.InitialUpdate
 }

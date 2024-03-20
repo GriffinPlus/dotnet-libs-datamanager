@@ -52,5 +52,5 @@ public enum DataNodeChangedFlags
 	/// <summary>
 	/// This flag indicates that this is the first update to a monitored data node.
 	/// </summary>
-	InitialUpdate = 0x00010000
+	InitialUpdate = DataNodeChangedFlagsInternal.InitialUpdate
 }

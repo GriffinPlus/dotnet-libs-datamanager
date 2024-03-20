@@ -22,7 +22,7 @@ public enum DataChangedFlags
 	/// <summary>
 	/// Nothing has changed.
 	/// </summary>
-	None = DataValueChangedFlagsInternal.None,
+	None = DataValueChangedFlagsInternal.None, // 0x00000000
 
 	/// <summary>
 	/// The <see cref="Data{T}.IsPersistent"/> property or the <see cref="IUntypedData.IsPersistent"/> property has changed.
@@ -32,22 +32,26 @@ public enum DataChangedFlags
 	/// <summary>
 	/// The <see cref="Data{T}.Properties"/> property or the <see cref="IUntypedData.Properties"/> property has changed.
 	/// </summary>
-	Properties = DataValueChangedFlagsInternal.Properties, // 0x00000100
+	Properties = DataValueChangedFlagsInternal.Properties, // 0x00010000
 
 	/// <summary>
 	/// The <see cref="Data{T}.Value"/> property or the <see cref="IUntypedData.Value"/> property has changed.
 	/// </summary>
-	Value = DataValueChangedFlagsInternal.Value, // 0x00000200
+	Value = DataValueChangedFlagsInternal.Value, // 0x00020000
 
 	/// <summary>
 	/// The <see cref="Data{T}.Timestamp"/> property or the <see cref="IUntypedData.Timestamp"/> property has changed.
 	/// </summary>
-	Timestamp = DataValueChangedFlagsInternal.Timestamp, // 0x00000400
+	Timestamp = DataValueChangedFlagsInternal.Timestamp, // 0x00040000
+
+	// The following flags do not exist for Data<T> instances
+	// Name = DataValueChangedFlagsInternal.Name, // 0x00080000
+	// Path = DataValueChangedFlagsInternal.Path, // 0x00100000
 
 	/// <summary>
 	/// The <see cref="Data{T}.IsHealthy"/> property or the <see cref="IUntypedData.IsHealthy"/> property has changed.
 	/// </summary>
-	IsHealthy = 0x00001000,
+	IsHealthy = 0x00200000,
 
 	/// <summary>
 	/// All flags (except <see cref="InitialUpdate"/>).
@@ -58,5 +62,5 @@ public enum DataChangedFlags
 	/// This flag indicates that this is the first update to a monitored data value
 	/// (is also set, if using data value references and the underlying data value changes entirely).
 	/// </summary>
-	InitialUpdate = 0x00010000
+	InitialUpdate = DataValueChangedFlagsInternal.InitialUpdate
 }

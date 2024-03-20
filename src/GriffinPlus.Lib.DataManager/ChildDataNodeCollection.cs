@@ -416,7 +416,7 @@ public sealed partial class ChildDataNodeCollection :
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
 				this,
 				ViewerChangedEventName,
-				this,
+				ViewerWrapper,
 				new ViewerDataNodeCollectionChangedEventArgs(
 					CollectionChangedAction.Added,
 					mNode.ViewerWrapper,
@@ -474,7 +474,7 @@ public sealed partial class ChildDataNodeCollection :
 					EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
 						this,
 						ViewerChangedEventName,
-						this,
+						ViewerWrapper,
 						new ViewerDataNodeCollectionChangedEventArgs(
 							CollectionChangedAction.Removed,
 							mNode.ViewerWrapper,
@@ -867,7 +867,7 @@ public sealed partial class ChildDataNodeCollection :
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
 				this,
 				ViewerChangedEventName,
-				this,
+				ViewerWrapper,
 				new ViewerDataNodeCollectionChangedEventArgs(
 					CollectionChangedAction.Removed,
 					mNode.ViewerWrapper,
@@ -923,7 +923,7 @@ public sealed partial class ChildDataNodeCollection :
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
 				this,
 				ViewerChangedEventName,
-				this,
+				ViewerWrapper,
 				new ViewerDataNodeCollectionChangedEventArgs(
 					CollectionChangedAction.Added,
 					mNode.ViewerWrapper,

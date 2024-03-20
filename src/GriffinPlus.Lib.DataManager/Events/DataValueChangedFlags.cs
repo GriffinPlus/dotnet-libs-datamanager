@@ -50,12 +50,22 @@ public enum DataValueChangedFlags
 	Timestamp = DataValueChangedFlagsInternal.Timestamp,
 
 	/// <summary>
+	/// The <see cref="DataValue{T}.Name"/> property or the <see cref="IUntypedDataValue.Name"/> property has changed.
+	/// </summary>
+	Name = DataValueChangedFlagsInternal.Name,
+
+	/// <summary>
+	/// The <see cref="DataValue{T}.Path"/> property or the <see cref="IUntypedDataValue.Path"/> property has changed.
+	/// </summary>
+	Path = DataValueChangedFlagsInternal.Path,
+
+	/// <summary>
 	/// All flags (except <see cref="InitialUpdate"/>).
 	/// </summary>
-	All = IsPersistent | IsDetached | Properties | Value | Timestamp,
+	All = IsPersistent | IsDetached | Properties | Value | Timestamp | Name | Path,
 
 	/// <summary>
 	/// This flag indicates that this is the first update to a monitored data value.
 	/// </summary>
-	InitialUpdate = 0x00010000
+	InitialUpdate = DataValueChangedFlagsInternal.InitialUpdate
 }

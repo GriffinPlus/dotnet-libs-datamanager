@@ -524,27 +524,50 @@ public partial class DataNode : IInternalObjectSerializer
 			DataNodePropertiesInternal oldUserProperties = mProperties & DataNodePropertiesInternal.UserProperties;
 			mProperties = value;
 
-			// abort if no event handler is registered
-			if (!EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
-				return;
+			// raise 'Changed' event and 'ChangedAsync' event
+			if (EventManager<DataNodeChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
+			{
+				// determine flags reflecting the property changes
+				DataNodePropertiesInternal newProperties = mProperties;
+				DataNodePropertiesInternal newUserProperties = mProperties & DataNodePropertiesInternal.UserProperties;
+				var changedFlags = DataNodeChangedFlags.None;
+				// add changed flags for all properties (user flags + administrative flags)
+				changedFlags |= (DataNodeChangedFlags)((~oldProperties & newProperties) | (oldProperties & ~newProperties));
+				// add changed flag for the 'Properties' property, if user properties have changed
+				changedFlags |= ((~oldUserProperties & newUserProperties) | (oldUserProperties & ~newUserProperties)) != 0
+					                ? DataNodeChangedFlags.Properties
+					                : DataNodeChangedFlags.None;
 
-			// determine flags reflecting the property changes
-			DataNodePropertiesInternal newProperties = mProperties;
-			DataNodePropertiesInternal newUserProperties = mProperties & DataNodePropertiesInternal.UserProperties;
-			var changedFlags = DataNodeChangedFlags.None;
-			// add changed flags for all properties (user flags + administrative flags)
-			changedFlags |= (DataNodeChangedFlags)((~oldProperties & newProperties) | (oldProperties & ~newProperties));
-			// add changed flag for the 'Properties' property, if user properties have changed
-			changedFlags |= ((~oldUserProperties & newUserProperties) | (oldUserProperties & ~newUserProperties)) != 0
-				                ? DataNodeChangedFlags.Properties
-				                : DataNodeChangedFlags.None;
+				// raise event
+				EventManager<DataNodeChangedEventArgs>.FireEvent(
+					this,
+					ChangedEventName,
+					this,
+					new DataNodeChangedEventArgs(this, changedFlags));
+			}
 
-			// raise event
-			EventManager<DataNodeChangedEventArgs>.FireEvent(
-				this,
-				ChangedEventName,
-				this,
-				new DataNodeChangedEventArgs(this, changedFlags));
+			// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
+			// ReSharper disable once InvertIf
+			if (EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
+			{
+				// determine flags reflecting the property changes
+				DataNodePropertiesInternal newProperties = mProperties;
+				DataNodePropertiesInternal newUserProperties = mProperties & DataNodePropertiesInternal.UserProperties;
+				var changedFlags = ViewerDataNodeChangedFlags.None;
+				// add changed flags for all properties (user flags + administrative flags)
+				changedFlags |= (ViewerDataNodeChangedFlags)((~oldProperties & newProperties) | (oldProperties & ~newProperties));
+				// add changed flag for the 'Properties' property, if user properties have changed
+				changedFlags |= ((~oldUserProperties & newUserProperties) | (oldUserProperties & ~newUserProperties)) != 0
+					                ? ViewerDataNodeChangedFlags.Properties
+					                : ViewerDataNodeChangedFlags.None;
+
+				// raise event
+				EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
+					this,
+					ViewerChangedEventName,
+					ViewerWrapper,
+					new ViewerDataNodeChangedEventArgs(this, changedFlags));
+			}
 		}
 	}
 
@@ -1780,13 +1803,13 @@ public partial class DataNode : IInternalObjectSerializer
 		mProperties = newProperties;
 
 		// abort if no event handler is registered
-		if (!EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
+		if (!EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 			return;
 
 		// raise event
 		EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
 			this,
-			ChangedEventName,
+			ViewerChangedEventName,
 			ViewerWrapper,
 			new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.IsDummy));
 	}
@@ -1807,17 +1830,28 @@ public partial class DataNode : IInternalObjectSerializer
 		DataNodePropertiesInternal oldProperties = mProperties;
 		mProperties = newProperties;
 
-		// abort if no event handler is registered
-		if (!EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
-			return;
+		// raise 'Changed' event and 'ChangedAsync' event
+		if (EventManager<DataNodeChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
+		{
+			DataNodeChangedFlags changedFlags = DataNodeChangedFlags.Properties | (DataNodeChangedFlags)((~mProperties & oldProperties) | (mProperties & ~oldProperties));
+			EventManager<DataNodeChangedEventArgs>.FireEvent(
+				this,
+				ChangedEventName,
+				this,
+				new DataNodeChangedEventArgs(this, changedFlags));
+		}
 
-		// raise event
-		DataNodeChangedFlags changedFlags = DataNodeChangedFlags.Properties | (DataNodeChangedFlags)((~mProperties & oldProperties) | (mProperties & ~oldProperties));
-		EventManager<DataNodeChangedEventArgs>.FireEvent(
-			this,
-			ChangedEventName,
-			this,
-			new DataNodeChangedEventArgs(this, changedFlags));
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
+		// ReSharper disable once InvertIf
+		if (EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
+		{
+			ViewerDataNodeChangedFlags changedFlags = ViewerDataNodeChangedFlags.Properties | (ViewerDataNodeChangedFlags)((~mProperties & oldProperties) | (mProperties & ~oldProperties));
+			EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
+				this,
+				ViewerChangedEventName,
+				ViewerWrapper,
+				new ViewerDataNodeChangedEventArgs(this, changedFlags));
+		}
 	}
 
 	/// <summary>
@@ -1890,14 +1924,24 @@ public partial class DataNode : IInternalObjectSerializer
 			        ? PathHelpers.AppendNameToPath(mParent.PathUnsynced, mName.AsSpan())
 			        : PathHelpers.RootPath;
 
-		// raise event
-		if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
+		// raise 'Changed' event and 'ChangedAsync' event
+		if (EventManager<DataNodeChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 		{
 			EventManager<DataNodeChangedEventArgs>.FireEvent(
 				this,
 				ChangedEventName,
 				this,
 				new DataNodeChangedEventArgs(this, DataNodeChangedFlags.Path));
+		}
+
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
+		if (EventManager<ViewerDataNodeChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
+		{
+			EventManager<ViewerDataNodeChangedEventArgs>.FireEvent(
+				this,
+				ViewerChangedEventName,
+				ViewerWrapper,
+				new ViewerDataNodeChangedEventArgs(this, ViewerDataNodeChangedFlags.Path));
 		}
 
 		// proceed changing the path of child nodes and data values...

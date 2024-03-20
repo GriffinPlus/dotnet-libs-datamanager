@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
+using GriffinPlus.Lib.DataManager.Viewer;
 using GriffinPlus.Lib.Events;
 using GriffinPlus.Lib.Logging;
 using GriffinPlus.Lib.Serialization;
@@ -198,7 +199,6 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		}
 
 		// raise 'UntypedChanged' event
-		// ReSharper disable once InvertIf
 		if (EventManager<UntypedDataValueChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
 			EventManager<UntypedDataValueChangedEventArgs>.FireEvent(
@@ -208,6 +208,31 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 				new UntypedDataValueChangedEventArgs(
 					this,
 					(DataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
+		}
+
+		// raise 'ViewerChanged' event
+		if (EventManager<ViewerDataValueChangedEventArgs<T>>.IsHandlerRegistered(this, ViewerChangedEventName))
+		{
+			EventManager<ViewerDataValueChangedEventArgs<T>>.FireEvent(
+				this,
+				ViewerChangedEventName,
+				ViewerWrapper,
+				new ViewerDataValueChangedEventArgs<T>(
+					this,
+					(ViewerDataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllViewerFlags)));
+		}
+
+		// raise 'ViewerUntypedChanged' event
+		// ReSharper disable once InvertIf
+		if (EventManager<UntypedViewerDataValueChangedEventArgs>.IsHandlerRegistered(this, ViewerUntypedChangedEventName))
+		{
+			EventManager<UntypedViewerDataValueChangedEventArgs>.FireEvent(
+				this,
+				ViewerUntypedChangedEventName,
+				ViewerWrapper,
+				new UntypedViewerDataValueChangedEventArgs(
+					this,
+					(ViewerDataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllViewerFlags)));
 		}
 	}
 
@@ -931,7 +956,14 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	void IUntypedDataValueInternal.UpdatePath()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
-		mPath = PathHelpers.AppendNameToPath(mParentNode.PathUnsynced, Name.AsSpan());
+
+		// re-create the path from the path of the parent node and the name of the data value
+		string path = PathHelpers.AppendNameToPath(mParentNode.PathUnsynced, Name.AsSpan());
+		bool changed = mPath != path;
+		mPath = path;
+
+		// raise events
+		if (changed) RaiseChangedEvents(DataValueChangedFlagsInternal.Path);
 	}
 
 	/// <inheritdoc/>

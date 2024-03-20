@@ -424,7 +424,7 @@ public partial class DataValueCollection :
 		var dataValue = new DataValue<T>(mNode, name, properties, value, timestamp); // value is not copied!
 		mBuffer.Add(dataValue);
 
-		// raise 'Changed' event, if the added value is regular
+		// raise 'Changed' event and 'ChangedAsync', if the added value is regular
 		if ((properties & DataValuePropertiesInternal.Dummy) == 0)
 		{
 			if (EventManager<DataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
@@ -437,13 +437,13 @@ public partial class DataValueCollection :
 			}
 		}
 
-		// raise 'ViewerChanged' event
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 		if (EventManager<ViewerDataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataValueCollectionChangedEventArgs>.FireEvent(
 				this,
 				ViewerChangedEventName,
-				this,
+				ViewerWrapper,
 				new ViewerDataValueCollectionChangedEventArgs(CollectionChangedAction.Added, mNode, dataValue));
 		}
 
@@ -495,7 +495,7 @@ public partial class DataValueCollection :
 			// remove value
 			mBuffer.RemoveAt(i);
 
-			// raise 'Changed' event
+			// raise 'Changed' event and 'ChangedAsync' event
 			if (EventManager<DataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 			{
 				EventManager<DataValueCollectionChangedEventArgs>.FireEvent(
@@ -508,13 +508,13 @@ public partial class DataValueCollection :
 						dataValue));
 			}
 
-			// raise 'ViewerChanged' event
+			// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 			if (EventManager<ViewerDataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 			{
 				EventManager<ViewerDataValueCollectionChangedEventArgs>.FireEvent(
 					this,
 					ViewerChangedEventName,
-					this,
+					ViewerWrapper,
 					new ViewerDataValueCollectionChangedEventArgs(
 						CollectionChangedAction.Removed,
 						mNode,
@@ -860,7 +860,7 @@ public partial class DataValueCollection :
 		// register previously removed data value references
 		mNode.DataTreeManager.RegisterDataValueReferencesUnsynced(references);
 
-		// raise 'Changed' event, if the removed data value was regular
+		// raise 'Changed' event and 'ChangedAsync', if the removed data value was regular
 		if (!dataValue.IsDummyUnsynced)
 		{
 			if (EventManager<DataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
@@ -876,13 +876,13 @@ public partial class DataValueCollection :
 			}
 		}
 
-		// raise 'ViewerChanged' event
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 		if (EventManager<ViewerDataValueCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataValueCollectionChangedEventArgs>.FireEvent(
 				this,
 				ViewerChangedEventName,
-				this,
+				ViewerWrapper,
 				new ViewerDataValueCollectionChangedEventArgs(
 					CollectionChangedAction.Removed,
 					mNode,
