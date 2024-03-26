@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10,33 +10,23 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// <summary>
 /// An expected snapshot of a <see cref="IUntypedViewerDataValue"/>.
 /// </summary>
-readonly struct ExpectedUntypedViewerDataValueSnapshot
+readonly struct ExpectedUntypedViewerDataValueSnapshot(
+	DateTime                    timestamp,
+	DataValuePropertiesInternal properties,
+	object                      value)
 {
-	/// <summary>
-	/// Initializes a new instance of the <see cref="ExpectedUntypedViewerDataValueSnapshot"/> class.
-	/// </summary>
-	internal ExpectedUntypedViewerDataValueSnapshot(
-		DateTime                    timestamp,
-		DataValuePropertiesInternal properties,
-		object                      value)
-	{
-		Timestamp = timestamp;
-		mProperties = properties;
-		Value = value;
-	}
-
 	#region Timestamp
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="UntypedViewerDataValueSnapshot.Timestamp"/> property.
 	/// </summary>
-	public DateTime Timestamp { get; }
+	public DateTime Timestamp { get; } = timestamp;
 
 	#endregion
 
 	#region Properties (incl. Boolean Accessors)
 
-	private readonly DataValuePropertiesInternal mProperties;
+	private readonly DataValuePropertiesInternal mProperties = properties;
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="UntypedViewerDataValueSnapshot.Properties"/> property.
@@ -65,7 +55,7 @@ readonly struct ExpectedUntypedViewerDataValueSnapshot
 	/// <summary>
 	/// Gets the expected value of the <see cref="UntypedViewerDataValueSnapshot.Value"/> property.
 	/// </summary>
-	public object Value { get; }
+	public object Value { get; } = value;
 
 	#endregion
 }

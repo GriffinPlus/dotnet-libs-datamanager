@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,6 +18,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// A data value associated with a data node.
 /// </summary>
 [InternalObjectSerializer(1)]
+[DebuggerDisplay("Name: {" + nameof(Name) + "}, Type: {" + nameof(Type) + ".FullName}, Properties: {" + nameof(Properties) + "}, Timestamp: {" + nameof(Timestamp) + "}, Value: {" + nameof(Value) + "}, Path: {" + nameof(Path) + "}")]
 public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSerializer
 {
 	#region Class Variables
@@ -186,7 +187,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 				changedFlags);
 		}
 
-		// raise 'Changed' event
+		// raise 'Changed' event and 'ChangedAsync' event
 		if (EventManager<DataValueChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
 			EventManager<DataValueChangedEventArgs<T>>.FireEvent(
@@ -198,7 +199,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					(DataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
 
-		// raise 'UntypedChanged' event
+		// raise 'UntypedChanged' event and 'UntypedChangedAsync' event
 		if (EventManager<UntypedDataValueChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
 			EventManager<UntypedDataValueChangedEventArgs>.FireEvent(
@@ -210,7 +211,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					(DataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
 
-		// raise 'ViewerChanged' event
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 		if (EventManager<ViewerDataValueChangedEventArgs<T>>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataValueChangedEventArgs<T>>.FireEvent(
@@ -222,7 +223,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 					(ViewerDataValueChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllViewerFlags)));
 		}
 
-		// raise 'ViewerUntypedChanged' event
+		// raise 'ViewerUntypedChanged' event and 'ViewerUntypedChangedAsync' event
 		// ReSharper disable once InvertIf
 		if (EventManager<UntypedViewerDataValueChangedEventArgs>.IsHandlerRegistered(this, ViewerUntypedChangedEventName))
 		{
@@ -453,10 +454,10 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 				// if the current value is persistent
 				if (mParentNode != null)
 				{
-					mParentNode.Regularize();
+					mParentNode.RegularizeUnsynced();
 					if ((mProperties & DataValuePropertiesInternal.Persistent) != 0)
 					{
-						mParentNode.MakePersistent();
+						mParentNode.MakePersistentUnsynced();
 					}
 				}
 
@@ -566,12 +567,12 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 
 			// regularize nodes up to the root node if the data value becomes regular
 			if ((mProperties & DataValuePropertiesInternal.Dummy) != 0 && (value & DataValuePropertiesInternal.Dummy) == 0)
-				mParentNode?.Regularize();
+				mParentNode?.RegularizeUnsynced();
 
 			// make all nodes on the path to this data value persistent as well, if the data value is regular
 			// (for dummy values this is done as soon as the data value is regularized by setting its value later on)
 			if ((value & DataValuePropertiesInternal.Dummy) == 0 && (value & DataValuePropertiesInternal.Persistent) != 0)
-				mParentNode?.MakePersistent();
+				mParentNode?.MakePersistentUnsynced();
 
 			// abort if the properties did not change
 			if (mProperties == value)
@@ -860,7 +861,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 
 	/// <summary>
 	/// Sets the value and the data value properties of the current data value in an atomic operation
-	/// (for internal use only, not synchronized, does not copy the value, raises events)
+	/// (for internal use only, not synchronized, does not copy the value, raises events).
 	/// </summary>
 	/// <param name="value">New value.</param>
 	/// <param name="propertiesToSet">Data value property flags to set.</param>
@@ -884,9 +885,9 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		// regularize parent nodes and make them persistent, if necessary
 		if ((newProperties & DataValuePropertiesInternal.Dummy) == 0)
 		{
-			mParentNode?.Regularize();
+			mParentNode?.RegularizeUnsynced();
 			if ((newProperties & DataValuePropertiesInternal.Persistent) != 0)
-				mParentNode?.MakePersistent();
+				mParentNode?.MakePersistentUnsynced();
 		}
 
 		// set value and timestamp, change properties and raise events, if necessary
@@ -944,7 +945,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	#region Other Internal Helper Methods
 
 	/// <inheritdoc/>
-	void IUntypedDataValueInternal.DetachFromDataTree()
+	void IUntypedDataValueInternal.DetachFromDataTreeUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 		Debug.Assert((mProperties & DataValuePropertiesInternal.Detached) == 0, "The data value is already detached.");
@@ -953,7 +954,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	}
 
 	/// <inheritdoc/>
-	void IUntypedDataValueInternal.UpdatePath()
+	void IUntypedDataValueInternal.UpdatePathUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -967,7 +968,7 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 	}
 
 	/// <inheritdoc/>
-	void IUntypedDataValueInternal.UpdateDataTreeManager(DataTreeManager dataTreeManager)
+	void IUntypedDataValueInternal.UpdateDataTreeManagerUnsynced(DataTreeManager dataTreeManager)
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 		DataTreeManager = dataTreeManager;
@@ -983,20 +984,20 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		if (IsDummyUnsynced)
 			return;
 
-		IUntypedDataValueInternal targetDataValue = destinationNode.Values.FindUnsynced(mName.AsSpan());
-		if (targetDataValue != null)
+		IUntypedDataValueInternal destinationDataValue = destinationNode.Values.FindUnsynced(mName.AsSpan());
+		if (destinationDataValue != null)
 		{
-			// target data value exists already
-			Debug.Assert(targetDataValue.IsDummyUnsynced);
-			if (targetDataValue.Type == typeof(T))
+			// destination data value exists already
+			Debug.Assert(destinationDataValue.IsDummyUnsynced);
+			if (destinationDataValue.Type == typeof(T))
 			{
 				// type matches expected type
 				// => set properties and value
-				lock (targetDataValue.DataTreeManager.Sync)
+				lock (destinationDataValue.DataTreeManager.Sync)
 				{
 					// share the value object with the copied data value
 					// (it is immutable within the data manager and copied when passed out)
-					targetDataValue.SetUnsynced(
+					destinationDataValue.SetUnsynced(
 						mValue,
 						mProperties & DataValuePropertiesInternal.UserProperties,
 						DataValuePropertiesInternal.All);
@@ -1008,18 +1009,18 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 				// => use type of the data value to copy and log error...
 				sLog.Write(
 					LogLevel.Error,
-					"Detected an inconsistent data value type during a subtree copy (target path: {0}, type of existing data value: {1}, type of data value to copy: {2})." + Environment.NewLine +
-					"The source data value was copied to the path of the target data value. Any existing data value references become invalid and cannot be used any further!",
-					targetDataValue.PathUnsynced,
-					targetDataValue.Type.FullName,
+					"Detected an inconsistent data value type during a subtree copy (destination path: {0}, type of existing data value: {1}, type of data value to copy: {2})." + Environment.NewLine +
+					"The source data value was copied to the path of the destination data value. Any existing data value references become invalid and cannot be used any further!",
+					destinationDataValue.PathUnsynced,
+					destinationDataValue.Type.FullName,
 					typeof(T).FullName);
 
 				// remove all data value references from the data value to remove
-				DataTreeManager.InvalidateReferencesForDataValueUnsynced(targetDataValue.PathUnsynced, true);
+				DataTreeManager.InvalidateReferencesForDataValueUnsynced(destinationDataValue.PathUnsynced, true);
 
 				// remove the data value
-				targetDataValue.RemoveUnsynced();
-				Debug.Assert(targetDataValue.ParentNode == null);
+				destinationDataValue.RemoveUnsynced();
+				Debug.Assert(destinationDataValue.ParentNode == null);
 
 				// add value
 				destinationNode.Values.AddInternalUnsynced(
@@ -1030,27 +1031,11 @@ public partial class DataValue<T> : IUntypedDataValueInternal, IInternalObjectSe
 		}
 		else
 		{
-			// target data value does not exist, yet
+			// destination data value does not exist, yet
 			destinationNode.Values.AddInternalUnsynced(
 				mName.AsSpan(),
 				mProperties & DataValuePropertiesInternal.UserProperties,
 				mValue);
-		}
-	}
-
-	#endregion
-
-	#region Overrides
-
-	/// <summary>
-	/// Gets the string representation of the current data value.
-	/// </summary>
-	/// <returns>The string representation of the current node.</returns>
-	public override string ToString()
-	{
-		lock (DataTreeManager.Sync)
-		{
-			return $"Name: {mName}, Type: {typeof(T).FullName}, Value: {mValue}, Properties: {mProperties}, Timestamp: {mTimestamp}, Path: {mPath}";
 		}
 	}
 

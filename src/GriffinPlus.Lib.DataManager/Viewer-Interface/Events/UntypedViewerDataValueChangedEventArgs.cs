@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,17 +29,6 @@ public sealed class UntypedViewerDataValueChangedEventArgs : DataManagerEventArg
 		mSnapshot = new UntypedViewerDataValueSnapshot(dataValue);
 		mDataValue = dataValue;
 		ChangedFlags = changedFlags;
-	}
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedViewerDataValueChangedEventArgs"/> class copying another instance.
-	/// </summary>
-	/// <param name="other">Event arguments to copy.</param>
-	private UntypedViewerDataValueChangedEventArgs(UntypedViewerDataValueChangedEventArgs other)
-	{
-		mSnapshot = new UntypedViewerDataValueSnapshot(other.mSnapshot);
-		mDataValue = other.mDataValue;
-		ChangedFlags = other.ChangedFlags;
 	}
 
 	#endregion
@@ -96,22 +85,6 @@ public sealed class UntypedViewerDataValueChangedEventArgs : DataManagerEventArg
 	/// Gets the flags indicating what properties have changed.
 	/// </summary>
 	public ViewerDataValueChangedFlags ChangedFlags { get; }
-
-	#endregion
-
-	#region Copying Event Arguments
-
-	/// <inheritdoc/>
-	public override DataManagerEventArgs[] Dupe(int count)
-	{
-		var copies = new DataManagerEventArgs[count];
-		for (int i = 0; i < count; i++)
-		{
-			copies[i] = new UntypedViewerDataValueChangedEventArgs(this);
-		}
-
-		return copies;
-	}
 
 	#endregion
 }

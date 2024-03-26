@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,7 @@ interface IUntypedDataInternal : IUntypedData
 	/// Updates the data value reference (for internal use only, not synchronized).
 	/// </summary>
 	/// <returns>Data value that was previously referenced.</returns>
-	IUntypedDataValueInternal UpdateDataValueReference();
+	IUntypedDataValueInternal UpdateDataValueReferenceUnsynced();
 
 	/// <summary>
 	/// Invalidates the data value reference (for internal use only, not synchronized).
@@ -48,5 +48,5 @@ interface IUntypedDataInternal : IUntypedData
 	/// otherwise <c>false</c>.
 	/// </param>
 	/// <returns>Data value that was previously referenced.</returns>
-	IUntypedDataValueInternal InvalidateDataValueReference(bool suppressChangedEvent);
+	IUntypedDataValueInternal InvalidateDataValueReferenceUnsynced(bool suppressChangedEvent);
 }

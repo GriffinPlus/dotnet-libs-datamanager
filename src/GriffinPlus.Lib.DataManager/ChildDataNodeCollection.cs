@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,6 +24,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// A collection containing child nodes of a data node.
 /// </summary>
 [InternalObjectSerializer(1)]
+[DebuggerDisplay("Count: {" + nameof(Count) + "}")]
 public sealed partial class ChildDataNodeCollection :
 	IEnumerable<DataNode>,
 	IInternalObjectSerializer
@@ -56,7 +57,7 @@ public sealed partial class ChildDataNodeCollection :
 					true,
 					true,
 					this,
-					new DataNodeCollectionChangedEventArgs(mNode, RegularNodesOnly));
+					new DataNodeCollectionChangedEventArgs(mNode, RegularNodesOnlyUnsynced));
 			}
 		}
 
@@ -86,7 +87,7 @@ public sealed partial class ChildDataNodeCollection :
 					true,
 					true,
 					this,
-					new DataNodeCollectionChangedEventArgs(mNode, RegularNodesOnly));
+					new DataNodeCollectionChangedEventArgs(mNode, RegularNodesOnlyUnsynced));
 			}
 		}
 
@@ -218,7 +219,7 @@ public sealed partial class ChildDataNodeCollection :
 		{
 			lock (mNode.DataTreeManager.Sync)
 			{
-				return RegularNodesOnly.Count();
+				return RegularNodesOnlyUnsynced.Count();
 			}
 		}
 	}
@@ -247,12 +248,12 @@ public sealed partial class ChildDataNodeCollection :
 
 	#endregion
 
-	#region RegularNodesOnly
+	#region RegularNodesOnlyUnsynced
 
 	/// <summary>
 	/// Gets all regular data nodes in the collection (for internal use only, not synchronized).
 	/// </summary>
-	private IEnumerable<DataNode> RegularNodesOnly
+	private IEnumerable<DataNode> RegularNodesOnlyUnsynced
 	{
 		get
 		{
@@ -277,7 +278,7 @@ public sealed partial class ChildDataNodeCollection :
 	{
 		lock (mNode.DataTreeManager.Sync)
 		{
-			DataNodePropertiesInternal properties = mNode.PropertiesUnsynced & ~DataNodePropertiesInternal.Dummy;
+			DataNodePropertiesInternal properties = mNode.PropertiesUnsynced & ~DataNodePropertiesInternal.AdministrativeProperties;
 			return AddUnsynced(name.AsSpan(), properties);
 		}
 	}
@@ -389,7 +390,7 @@ public sealed partial class ChildDataNodeCollection :
 #endif
 
 		// regularize current node, if necessary
-		if (mNode.IsDummyUnsynced) mNode.Regularize();
+		if (mNode.IsDummyUnsynced) mNode.RegularizeUnsynced();
 
 		// add node to the collection
 		var newNode = new DataNode(mNode, name, properties);
@@ -397,7 +398,7 @@ public sealed partial class ChildDataNodeCollection :
 
 		// the added node is always regular
 
-		// raise 'Changed' event
+		// raise 'Changed' event and 'ChangedAsync' event
 		if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 		{
 			EventManager<DataNodeCollectionChangedEventArgs>.FireEvent(
@@ -410,7 +411,7 @@ public sealed partial class ChildDataNodeCollection :
 					newNode));
 		}
 
-		// raise 'ViewerChanged' event
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 		if (EventManager<ViewerDataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
@@ -455,7 +456,7 @@ public sealed partial class ChildDataNodeCollection :
 
 				// the removed node is always regular...
 
-				// raise 'Changed' event
+				// raise 'Changed' event and 'ChangedAsync' event
 				if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
 				{
 					EventManager<DataNodeCollectionChangedEventArgs>.FireEvent(
@@ -468,7 +469,7 @@ public sealed partial class ChildDataNodeCollection :
 							node));
 				}
 
-				// raise 'ViewerChanged' event
+				// raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 				if (EventManager<ViewerDataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 				{
 					EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
@@ -482,7 +483,7 @@ public sealed partial class ChildDataNodeCollection :
 				}
 
 				// the removed node becomes the root node of its subtree
-				node.BecomeRootNode();
+				node.BecomeRootNodeUnsynced();
 			}
 
 			// register previously removed data value references
@@ -649,7 +650,7 @@ public sealed partial class ChildDataNodeCollection :
 		lock (mNode.DataTreeManager.Sync)
 		{
 			return new MonitorSynchronizedEnumerator<DataNode>(
-				RegularNodesOnly.GetEnumerator(),
+				RegularNodesOnlyUnsynced.GetEnumerator(),
 				mNode.DataTreeManager.Sync);
 		}
 	}
@@ -795,6 +796,8 @@ public sealed partial class ChildDataNodeCollection :
 	/// </returns>
 	internal bool RemoveUnsynced(DataNode node, bool allowDummy)
 	{
+		Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+
 		// abort if the node to remove is null
 		if (node == null)
 			return false;
@@ -832,10 +835,6 @@ public sealed partial class ChildDataNodeCollection :
 	{
 		Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
-		// abort if the index is negative
-		if (index < 0)
-			return false;
-
 		DataNode node = mBuffer[index];
 
 		// unregister data value references below the node to remove
@@ -845,7 +844,7 @@ public sealed partial class ChildDataNodeCollection :
 		// remove node from the collection
 		mBuffer.RemoveAt(index);
 
-		// raise 'Changed' event, if the removed node was regular
+		// raise 'Changed' event and 'ChangedAsync' event, if the removed node was regular
 		if (!node.IsDummyUnsynced)
 		{
 			if (EventManager<DataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ChangedEventName))
@@ -861,7 +860,7 @@ public sealed partial class ChildDataNodeCollection :
 			}
 		}
 
-		// always raise 'ViewerChanged' event
+		// always raise 'ViewerChanged' event and 'ViewerChangedAsync' event
 		if (EventManager<ViewerDataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(
@@ -875,7 +874,7 @@ public sealed partial class ChildDataNodeCollection :
 		}
 
 		// the removed node becomes the root node of its subtree
-		node.BecomeRootNode();
+		node.BecomeRootNodeUnsynced();
 
 		// register previously removed data value references
 		// (creates dummy nodes/values and binds them accordingly to the references)
@@ -896,7 +895,7 @@ public sealed partial class ChildDataNodeCollection :
 	{
 		lock (mNode.DataTreeManager.Sync)
 		{
-			return [.. RegularNodesOnly];
+			return [.. RegularNodesOnlyUnsynced];
 		}
 	}
 
@@ -916,8 +915,8 @@ public sealed partial class ChildDataNodeCollection :
 		var node = new DataNode(mNode, name, properties | DataNodePropertiesInternal.Dummy);
 		mBuffer.Add(node);
 
-		// raise 'ViewerChanged' event only
-		// (the 'Changed' event must be raised for regular nodes only)
+		// raise 'ViewerChanged' event and 'ViewerChangedAsync' event only
+		// (the 'Changed' event and the 'ChangedAsync' event must be raised for regular nodes only)
 		if (EventManager<ViewerDataNodeCollectionChangedEventArgs>.IsHandlerRegistered(this, ViewerChangedEventName))
 		{
 			EventManager<ViewerDataNodeCollectionChangedEventArgs>.FireEvent(

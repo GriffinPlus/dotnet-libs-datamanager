@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -85,19 +85,6 @@ public class DataManagerDefaultSerializer : DataManagerSerializerBase
 		try
 		{
 			return Serializer.CopySerializableObject(obj);
-		}
-		catch (Exception ex)
-		{
-			throw new SerializationException("Copying object failed. See inner exception for details.", ex);
-		}
-	}
-
-	/// <inheritdoc/>
-	public override T[] CopySerializableValue<T>(T obj, int count)
-	{
-		try
-		{
-			return Serializer.CopySerializableObject(obj, count);
 		}
 		catch (Exception ex)
 		{

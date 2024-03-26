@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ public class DataTreeManager
 		foreach (IUntypedDataInternal reference in references)
 		{
 			RegisterDataValueReferenceUnsynced(reference);
-			reference.UpdateDataValueReference(); // creates the path, if necessary
+			reference.UpdateDataValueReferenceUnsynced(); // creates the path, if necessary
 		}
 	}
 
@@ -174,7 +174,7 @@ public class DataTreeManager
 			result.Add(data);
 			dataValueReferences.RemoveAt(i);
 			RemoveReferencedDataValueIfPossibleUnsynced(data, dataValueReferences);
-			data.InvalidateDataValueReference(suppressChangedEvent);
+			data.InvalidateDataValueReferenceUnsynced(suppressChangedEvent);
 		}
 
 		return [.. result];
@@ -213,7 +213,7 @@ public class DataTreeManager
 				result.Add(data);
 				dataValueReferences.RemoveAt(i);
 				RemoveReferencedDataValueIfPossibleUnsynced(data, dataValueReferences);
-				data.InvalidateDataValueReference(suppressChangedEvent);
+				data.InvalidateDataValueReferenceUnsynced(suppressChangedEvent);
 			}
 		}
 
@@ -237,13 +237,11 @@ public class DataTreeManager
 		if (!mDataValueReferenceMap.TryGetValue(path, out List<WeakReference<IUntypedDataInternal>> dataValueReferences) || dataValueReferences.Count == 0)
 			return;
 
-		IUntypedDataValueInternal idvi = null;
 		for (int i = dataValueReferences.Count - 1; i >= 0; i--)
 		{
 			WeakReference<IUntypedDataInternal> weakReference = dataValueReferences[i];
 			if (!weakReference.TryGetTarget(out IUntypedDataInternal data)) continue;
-			IUntypedDataValueInternal x = data.InvalidateDataValueReference(suppressChangedEvent);
-			Debug.Assert(idvi == null || idvi == x);
+			data.InvalidateDataValueReferenceUnsynced(suppressChangedEvent);
 			dataValueReferences.RemoveAt(i);
 		}
 	}

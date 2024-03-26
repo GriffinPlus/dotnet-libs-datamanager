@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+//// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 //// The source code is licensed under the MIT license.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,20 +16,9 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// which is important for viewers to show the correct state of the data tree - with regular and dummy data.
 /// Modifying operations do not affect dummy nodes as dummy nodes are managed by the data tree manager.
 /// </remarks>
-[DebuggerDisplay("ViewerDataNode => Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
+[DebuggerDisplay("Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
 public sealed class ViewerDataNode
 {
-	/// <summary>
-	/// Initializes a new <see cref="ViewerDataNode"/> wrapping a <see cref="DataNode"/>.
-	/// </summary>
-	/// <param name="node">The <see cref="DataNode"/> to wrap.</param>
-	internal ViewerDataNode(DataNode node)
-	{
-		WrappedNode = node;
-		Children = new ViewerChildDataNodeCollection(node.Children);
-		Values = new ViewerDataValueCollection(node.Values);
-	}
-
 	/// <inheritdoc cref="DataNode.ViewerChanged"/>
 	public event EventHandler<ViewerDataNodeChangedEventArgs> Changed
 	{
@@ -42,6 +31,17 @@ public sealed class ViewerDataNode
 	{
 		add => WrappedNode.ViewerChangedAsync += value;
 		remove => WrappedNode.ViewerChangedAsync -= value;
+	}
+
+	/// <summary>
+	/// Initializes a new <see cref="ViewerDataNode"/> wrapping a <see cref="DataNode"/>.
+	/// </summary>
+	/// <param name="node">The <see cref="DataNode"/> to wrap.</param>
+	internal ViewerDataNode(DataNode node)
+	{
+		WrappedNode = node;
+		Children = new ViewerChildDataNodeCollection(node.Children);
+		Values = new ViewerDataValueCollection(node.Values);
 	}
 
 	/// <summary>

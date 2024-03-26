@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,15 +16,15 @@ public enum DataValueProperties
 	/// <summary>
 	/// None.
 	/// </summary>
-	None = 0x00000000,
+	None = DataValuePropertiesInternal.None,
 
 	/// <summary>
 	/// The data value is included when persisting the data tree.
 	/// </summary>
-	Persistent = 0x00000001,
+	Persistent = DataValuePropertiesInternal.Persistent,
 
 	/// <summary>
 	/// All public property flags.
 	/// </summary>
-	All = Persistent
+	All = DataValuePropertiesInternal.UserProperties
 }

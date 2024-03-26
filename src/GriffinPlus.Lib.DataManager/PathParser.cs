@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +85,7 @@ unsafe ref struct PathParser
 				while (pcPath != pcPathEnd)
 				{
 					char c = *pcPath;
-					if (!PathHelpers.IsValidNameChar(c) || !char.IsWhiteSpace(c)) break;
+					if (!char.IsWhiteSpace(c)) break; // all whitespaces are valid characters
 					pcPath++;
 				}
 
@@ -190,7 +190,7 @@ unsafe ref struct PathParser
 				while (pcPath != pcPathEnd)
 				{
 					char c = *pcPath;
-					if (!PathHelpers.IsValidNameChar(c) || !char.IsWhiteSpace(c)) break;
+					if (!char.IsWhiteSpace(c)) break; // all whitespaces are valid characters
 					pcPath++;
 				}
 

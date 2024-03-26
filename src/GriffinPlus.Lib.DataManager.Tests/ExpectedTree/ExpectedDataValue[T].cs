@@ -16,7 +16,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// <param name="name">Name of the expected data value.</param>
 /// <param name="properties">Properties of the expected data value.</param>
 /// <param name="value">Value of the expected data value.</param>
-[DebuggerDisplay("Data Value => Name: {Name} | Properties: {Properties} | Path: {Path} | Value: {Value}")]
+[DebuggerDisplay("Name: {" + nameof(Name) + "} | Properties: {" + nameof(Properties) + "} | Path: {" + nameof(Path) + "} | Value: {" + nameof(Value) + "}")]
 partial class ExpectedDataValue<T>(
 	string                      name,
 	DataValuePropertiesInternal properties,
@@ -36,135 +36,16 @@ partial class ExpectedDataValue<T>(
 			if (mActualDataValue == value)
 				return;
 
-			// unregister event handlers from the old data value
-			if (mActualDataValue != null)
-			{
-				mActualDataValue.Changed -= ChangedHandler;
-				mActualDataValue.ChangedAsync -= ChangedAsyncHandler;
-				mActualDataValue.UntypedChanged -= UntypedChangedHandler;
-				mActualDataValue.UntypedChangedAsync -= UntypedChangedAsyncHandler;
-				mActualDataValue.ViewerChanged -= ViewerChangedHandler;
-				mActualDataValue.ViewerChangedAsync -= ViewerChangedAsyncHandler;
-				mActualDataValue.ViewerUntypedChanged -= ViewerUntypedChangedHandler;
-				mActualDataValue.ViewerUntypedChangedAsync -= ViewerUntypedChangedAsyncHandler;
-			}
+			// unregister event handlers bound to the old data value recursively
+			(this as IExpectedUntypedDataValue).UnregisterEvents();
 
-			// update the actual data node
+			// set the actual data value
 			mActualDataValue = value;
 
 			// clear all expected and received events before registering any event of the new node
 			// (the node will immediately fire an initial changed event...)
 			ResetExpectedEvents();
 			ResetReceivedEvents();
-
-			// register event handlers at the new data value
-			// ReSharper disable once InvertIf
-			if (mActualDataValue != null)
-			{
-				// add expected initial 'Changed' event
-				mExpectedChangedEvents.Add(
-					new ExpectedChangedEventItem(
-						nameof(DataValue<T>.Changed),
-						mActualDataValue,
-						new ExpectedDataValueChangedEventArgs<T>(
-							mActualDataValue,
-							new ExpectedDataValueSnapshot<T>(Timestamp, mProperties, Value),
-							DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
-
-				// register 'Changed' event
-				mActualDataValue.Changed += ChangedHandler;
-
-				// add expected initial 'ChangedAsync' event
-				mExpectedChangedAsyncEvents.Add(
-					new ExpectedChangedEventItem(
-						nameof(DataValue<T>.ChangedAsync),
-						mActualDataValue,
-						new ExpectedDataValueChangedEventArgs<T>(
-							mActualDataValue,
-							new ExpectedDataValueSnapshot<T>(Timestamp, mProperties, Value),
-							DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
-
-				// register 'ChangedAsync' event
-				mActualDataValue.ChangedAsync += ChangedAsyncHandler;
-
-				// add expected initial 'UntypedChanged' event
-				mExpectedUntypedChangedEvents.Add(
-					new ExpectedUntypedChangedEventItem(
-						nameof(DataValue<T>.UntypedChanged),
-						mActualDataValue,
-						new ExpectedUntypedDataValueChangedEventArgs(
-							mActualDataValue,
-							new ExpectedUntypedDataValueSnapshot(Timestamp, mProperties, Value),
-							DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
-
-				// register 'UntypedChanged' event
-				mActualDataValue.UntypedChanged += UntypedChangedHandler;
-
-				// add expected initial 'UntypedChangedAsync' event
-				mExpectedUntypedChangedAsyncEvents.Add(
-					new ExpectedUntypedChangedEventItem(
-						nameof(DataValue<T>.UntypedChangedAsync),
-						mActualDataValue,
-						new ExpectedUntypedDataValueChangedEventArgs(
-							mActualDataValue,
-							new ExpectedUntypedDataValueSnapshot(Timestamp, mProperties, Value),
-							DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
-
-				// register 'UntypedChangedAsync' event
-				mActualDataValue.UntypedChangedAsync += UntypedChangedAsyncHandler;
-
-				// add expected initial 'ViewerChanged' event
-				mExpectedViewerChangedEvents.Add(
-					new ExpectedViewerChangedEventItem(
-						nameof(DataValue<T>.ViewerChanged),
-						mActualDataValue.ViewerWrapper,
-						new ExpectedViewerDataValueChangedEventArgs<T>(
-							mActualDataValue.ViewerWrapper,
-							new ExpectedViewerDataValueSnapshot<T>(Timestamp, mProperties, Value),
-							ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
-
-				// register 'ViewerChanged' event
-				mActualDataValue.ViewerChanged += ViewerChangedHandler;
-
-				// add expected initial 'ViewerChangedAsync' event
-				mExpectedViewerChangedAsyncEvents.Add(
-					new ExpectedViewerChangedEventItem(
-						nameof(DataValue<T>.ViewerChangedAsync),
-						mActualDataValue.ViewerWrapper,
-						new ExpectedViewerDataValueChangedEventArgs<T>(
-							mActualDataValue.ViewerWrapper,
-							new ExpectedViewerDataValueSnapshot<T>(Timestamp, mProperties, Value),
-							ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
-
-				// register 'ViewerChangedAsync' event
-				mActualDataValue.ViewerChangedAsync += ViewerChangedAsyncHandler;
-
-				// add expected initial 'ViewerUntypedChanged' event
-				mExpectedViewerUntypedChangedEvents.Add(
-					new ExpectedViewerUntypedChangedEventItem(
-						nameof(DataValue<T>.ViewerUntypedChanged),
-						mActualDataValue.ViewerWrapper,
-						new ExpectedUntypedViewerDataValueChangedEventArgs(
-							mActualDataValue.ViewerWrapper,
-							new ExpectedUntypedViewerDataValueSnapshot(Timestamp, mProperties, Value),
-							ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
-
-				// register 'ViewerUntypedChanged' event
-				mActualDataValue.ViewerUntypedChanged += ViewerUntypedChangedHandler;
-
-				// add expected initial 'ViewerUntypedChangedAsync' event
-				mExpectedViewerUntypedChangedAsyncEvents.Add(
-					new ExpectedViewerUntypedChangedEventItem(
-						nameof(DataValue<T>.ViewerUntypedChangedAsync),
-						mActualDataValue.ViewerWrapper,
-						new ExpectedUntypedViewerDataValueChangedEventArgs(
-							mActualDataValue.ViewerWrapper,
-							new ExpectedUntypedViewerDataValueSnapshot(Timestamp, mProperties, Value),
-							ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
-
-				// register 'ViewerUntypedChangedAsync' event
-				mActualDataValue.ViewerUntypedChangedAsync += ViewerUntypedChangedAsyncHandler;
-			}
 		}
 	}
 
@@ -296,6 +177,7 @@ partial class ExpectedDataValue<T>(
 
 	#region Properties
 
+	// ReSharper disable once ReplaceWithPrimaryConstructorParameter
 	private DataValuePropertiesInternal mProperties = properties;
 
 	/// <inheritdoc/>
@@ -403,7 +285,7 @@ partial class ExpectedDataValue<T>(
 	}
 
 	/// <inheritdoc/>
-	public void CheckViewerConsistency(IUntypedViewerDataValue actualViewerDataValue)
+	public void AssertViewerConsistency(IUntypedViewerDataValue actualViewerDataValue)
 	{
 		Assert.NotNull(actualViewerDataValue);
 
@@ -431,7 +313,7 @@ partial class ExpectedDataValue<T>(
 		Assert.NotNull(actualDataValue);
 		ActualDataValue = (DataValue<T>)actualDataValue;
 		AssertConsistency();
-		CheckViewerConsistency(actualDataValue.ViewerWrapper);
+		AssertViewerConsistency(actualDataValue.ViewerWrapper);
 	}
 
 	#endregion
@@ -778,6 +660,138 @@ partial class ExpectedDataValue<T>(
 				return [.. mReceivedViewerUntypedChangedAsyncEvents];
 			}
 		}
+	}
+
+	/// <summary>
+	/// Registers all events of the actual data value.
+	/// </summary>
+	void IExpectedUntypedDataValue.RegisterEvents()
+	{
+		Assert.NotNull(mActualDataValue);
+
+		// register 'Changed' event
+		mActualDataValue.Changed += ChangedHandler;
+
+		// add expected initial 'Changed' event
+		mExpectedChangedEvents.Add(
+			new ExpectedChangedEventItem(
+				nameof(DataValue<T>.Changed),
+				mActualDataValue,
+				new ExpectedDataValueChangedEventArgs<T>(
+					mActualDataValue,
+					new ExpectedDataValueSnapshot<T>(Timestamp, mProperties, Value),
+					DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
+
+		// register 'ChangedAsync' event
+		mActualDataValue.ChangedAsync += ChangedAsyncHandler;
+
+		// add expected initial 'ChangedAsync' event
+		mExpectedChangedAsyncEvents.Add(
+			new ExpectedChangedEventItem(
+				nameof(DataValue<T>.ChangedAsync),
+				mActualDataValue,
+				new ExpectedDataValueChangedEventArgs<T>(
+					mActualDataValue,
+					new ExpectedDataValueSnapshot<T>(Timestamp, mProperties, Value),
+					DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
+
+		// register 'UntypedChanged' event
+		mActualDataValue.UntypedChanged += UntypedChangedHandler;
+
+		// add expected initial 'UntypedChanged' event
+		mExpectedUntypedChangedEvents.Add(
+			new ExpectedUntypedChangedEventItem(
+				nameof(DataValue<T>.UntypedChanged),
+				mActualDataValue,
+				new ExpectedUntypedDataValueChangedEventArgs(
+					mActualDataValue,
+					new ExpectedUntypedDataValueSnapshot(Timestamp, mProperties, Value),
+					DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
+
+		// register 'UntypedChangedAsync' event
+		mActualDataValue.UntypedChangedAsync += UntypedChangedAsyncHandler;
+
+		// add expected initial 'UntypedChangedAsync' event
+		mExpectedUntypedChangedAsyncEvents.Add(
+			new ExpectedUntypedChangedEventItem(
+				nameof(DataValue<T>.UntypedChangedAsync),
+				mActualDataValue,
+				new ExpectedUntypedDataValueChangedEventArgs(
+					mActualDataValue,
+					new ExpectedUntypedDataValueSnapshot(Timestamp, mProperties, Value),
+					DataValueChangedFlags.All | DataValueChangedFlags.InitialUpdate)));
+
+		// register 'ViewerChanged' event
+		mActualDataValue.ViewerChanged += ViewerChangedHandler;
+
+		// add expected initial 'ViewerChanged' event
+		mExpectedViewerChangedEvents.Add(
+			new ExpectedViewerChangedEventItem(
+				nameof(DataValue<T>.ViewerChanged),
+				mActualDataValue.ViewerWrapper,
+				new ExpectedViewerDataValueChangedEventArgs<T>(
+					mActualDataValue.ViewerWrapper,
+					new ExpectedViewerDataValueSnapshot<T>(Timestamp, mProperties, Value),
+					ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
+
+		// register 'ViewerChangedAsync' event
+		mActualDataValue.ViewerChangedAsync += ViewerChangedAsyncHandler;
+
+		// add expected initial 'ViewerChangedAsync' event
+		mExpectedViewerChangedAsyncEvents.Add(
+			new ExpectedViewerChangedEventItem(
+				nameof(DataValue<T>.ViewerChangedAsync),
+				mActualDataValue.ViewerWrapper,
+				new ExpectedViewerDataValueChangedEventArgs<T>(
+					mActualDataValue.ViewerWrapper,
+					new ExpectedViewerDataValueSnapshot<T>(Timestamp, mProperties, Value),
+					ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
+
+		// register 'ViewerUntypedChanged' event
+		mActualDataValue.ViewerUntypedChanged += ViewerUntypedChangedHandler;
+
+		// add expected initial 'ViewerUntypedChanged' event
+		mExpectedViewerUntypedChangedEvents.Add(
+			new ExpectedViewerUntypedChangedEventItem(
+				nameof(DataValue<T>.ViewerUntypedChanged),
+				mActualDataValue.ViewerWrapper,
+				new ExpectedUntypedViewerDataValueChangedEventArgs(
+					mActualDataValue.ViewerWrapper,
+					new ExpectedUntypedViewerDataValueSnapshot(Timestamp, mProperties, Value),
+					ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
+
+		// register 'ViewerUntypedChangedAsync' event
+		mActualDataValue.ViewerUntypedChangedAsync += ViewerUntypedChangedAsyncHandler;
+
+		// add expected initial 'ViewerUntypedChangedAsync' event
+		mExpectedViewerUntypedChangedAsyncEvents.Add(
+			new ExpectedViewerUntypedChangedEventItem(
+				nameof(DataValue<T>.ViewerUntypedChangedAsync),
+				mActualDataValue.ViewerWrapper,
+				new ExpectedUntypedViewerDataValueChangedEventArgs(
+					mActualDataValue.ViewerWrapper,
+					new ExpectedUntypedViewerDataValueSnapshot(Timestamp, mProperties, Value),
+					ViewerDataValueChangedFlags.All | ViewerDataValueChangedFlags.InitialUpdate)));
+	}
+
+	/// <summary>
+	/// Unregisters all events of the actual data value.
+	/// </summary>
+	void IExpectedUntypedDataValue.UnregisterEvents()
+	{
+		// abort if no actual data node is set
+		if (mActualDataValue == null)
+			return;
+
+		// unregister collection events
+		mActualDataValue.Changed -= ChangedHandler;
+		mActualDataValue.ChangedAsync -= ChangedAsyncHandler;
+		mActualDataValue.UntypedChanged -= UntypedChangedHandler;
+		mActualDataValue.UntypedChangedAsync -= UntypedChangedAsyncHandler;
+		mActualDataValue.ViewerChanged -= ViewerChangedHandler;
+		mActualDataValue.ViewerChangedAsync -= ViewerChangedAsyncHandler;
+		mActualDataValue.ViewerUntypedChanged -= ViewerUntypedChangedHandler;
+		mActualDataValue.ViewerUntypedChangedAsync -= ViewerUntypedChangedAsyncHandler;
 	}
 
 	/// <inheritdoc/>

@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +22,7 @@ public enum ViewerDataNodeChangedFlags
 	/// <summary>
 	/// Nothing has changed.
 	/// </summary>
-	None = 0x00000000,
+	None = DataNodeChangedFlagsInternal.None,
 
 	/// <summary>
 	/// The <see cref="ViewerDataNode.IsPersistent"/> property has changed.
@@ -52,10 +52,10 @@ public enum ViewerDataNodeChangedFlags
 	/// <summary>
 	/// All flags (except <see cref="InitialUpdate"/>).
 	/// </summary>
-	All = IsPersistent | IsDummy | Properties | Name | Path,
+	All = DataNodeChangedFlagsInternal.AllViewerFlags,
 
 	/// <summary>
 	/// This flag indicates that this is the first update to a monitored data node.
 	/// </summary>
-	InitialUpdate = 0x00010000
+	InitialUpdate = DataNodeChangedFlagsInternal.InitialUpdate
 }

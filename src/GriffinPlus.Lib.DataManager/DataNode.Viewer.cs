@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ partial class DataNode
 					this,
 					ViewerChangedEventName,
 					value,
-					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
+					SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					ViewerWrapper,
@@ -187,7 +187,7 @@ partial class DataNode
 	/// <summary>
 	/// Locks the entire data tree and calls the specified action method within the lock
 	/// (do not perform excessive calculations in the callback method and do not block, since the entire
-	/// data tree is locked and blocking might result in a deadlock!!!)
+	/// data tree is locked and blocking might result in a deadlock!!!).
 	/// </summary>
 	/// <param name="action">Method to call within the locked section.</param>
 	internal void ViewerExecuteAtomically(ViewerDataNodeAction action)
@@ -201,7 +201,7 @@ partial class DataNode
 	/// <summary>
 	/// Locks the entire data tree and calls the specified action method within the lock
 	/// (do not perform excessive calculations in the callback method and do not block, since the entire
-	/// data tree is locked and blocking might result in a deadlock!!!)
+	/// data tree is locked and blocking might result in a deadlock!!!).
 	/// </summary>
 	/// <param name="action">Method to call within the locked section.</param>
 	/// <param name="state">Some state object to pass to the action.</param>

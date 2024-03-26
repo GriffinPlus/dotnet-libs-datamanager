@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -68,19 +68,4 @@ public sealed class DataValueCollectionChangedEventArgs : DataManagerEventArgs
 	/// <see cref="Action"/> is <see cref="CollectionChangedAction.InitialUpdate"/>.
 	/// </summary>
 	public IEnumerable<IUntypedDataValue> DataValues => mDataValues;
-
-	/// <summary>
-	/// Returns a number of copies of the current instance.
-	/// </summary>
-	/// <param name="count">Number of copies to create.</param>
-	/// <returns>
-	/// Copies of the current instance
-	/// (actually the current instance is returned, since the instance is immutable).
-	/// </returns>
-	public override DataManagerEventArgs[] Dupe(int count)
-	{
-		var copies = new DataManagerEventArgs[count];
-		for (int i = 0; i < count; i++) copies[i] = this;
-		return copies;
-	}
 }

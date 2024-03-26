@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -13,6 +13,8 @@ namespace GriffinPlus.Lib.DataManager;
 /// </summary>
 public sealed class UntypedDataValueChangedEventArgs : DataManagerEventArgs
 {
+	#region Construction
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UntypedDataValueChangedEventArgs"/> class
 	/// (for internal use only, not synchronized).<br/>
@@ -29,16 +31,7 @@ public sealed class UntypedDataValueChangedEventArgs : DataManagerEventArgs
 		ChangedFlags = changedFlags;
 	}
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="UntypedDataValueChangedEventArgs"/> class copying another instance.
-	/// </summary>
-	/// <param name="other">Event arguments to copy.</param>
-	private UntypedDataValueChangedEventArgs(UntypedDataValueChangedEventArgs other)
-	{
-		mSnapshot = new UntypedDataValueSnapshot(other.mSnapshot);
-		mDataValue = other.mDataValue;
-		ChangedFlags = other.ChangedFlags;
-	}
+	#endregion
 
 	#region DataValue
 
@@ -92,22 +85,6 @@ public sealed class UntypedDataValueChangedEventArgs : DataManagerEventArgs
 	/// Gets the flags indicating what properties have changed.
 	/// </summary>
 	public DataValueChangedFlags ChangedFlags { get; }
-
-	#endregion
-
-	#region Copying Event Arguments
-
-	/// <inheritdoc/>
-	public override DataManagerEventArgs[] Dupe(int count)
-	{
-		var copies = new DataManagerEventArgs[count];
-		for (int i = 0; i < count; i++)
-		{
-			copies[i] = new UntypedDataValueChangedEventArgs(this);
-		}
-
-		return copies;
-	}
 
 	#endregion
 }

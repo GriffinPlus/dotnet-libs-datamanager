@@ -1,11 +1,12 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GriffinPlus.Lib.DataManager.Viewer;
 
@@ -17,17 +18,9 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// which is important for viewers to show the correct state of the data tree - with regular and dummy data.
 /// Modifying operations do not affect dummy nodes as dummy nodes are managed by the data tree manager.
 /// </remarks>
+[DebuggerDisplay("Count: {" + nameof(Count) + "}")]
 public sealed class ViewerDataValueCollection : IEnumerable<IUntypedViewerDataValue>
 {
-	/// <summary>
-	/// Initializes a new <see cref="ViewerDataValueCollection"/> wrapping a <see cref="DataValueCollection"/>.
-	/// </summary>
-	/// <param name="collection">The <see cref="DataValueCollection"/> to wrap.</param>
-	internal ViewerDataValueCollection(DataValueCollection collection)
-	{
-		WrappedCollection = collection;
-	}
-
 	/// <inheritdoc cref="DataValueCollection.ViewerChanged"/>
 	public event EventHandler<ViewerDataValueCollectionChangedEventArgs> Changed
 	{
@@ -40,6 +33,15 @@ public sealed class ViewerDataValueCollection : IEnumerable<IUntypedViewerDataVa
 	{
 		add => WrappedCollection.ViewerChangedAsync += value;
 		remove => WrappedCollection.ViewerChangedAsync -= value;
+	}
+
+	/// <summary>
+	/// Initializes a new <see cref="ViewerDataValueCollection"/> wrapping a <see cref="DataValueCollection"/>.
+	/// </summary>
+	/// <param name="collection">The <see cref="DataValueCollection"/> to wrap.</param>
+	internal ViewerDataValueCollection(DataValueCollection collection)
+	{
+		WrappedCollection = collection;
 	}
 
 	/// <summary>
@@ -99,7 +101,7 @@ public sealed class ViewerDataValueCollection : IEnumerable<IUntypedViewerDataVa
 		return WrappedCollection.ViewerGetEnumerator();
 	}
 
-	/// <inheritdoc cref="DataValueCollection.Remove(IUntypedDataValue)"/>
+	/// <inheritdoc cref="DataValueCollection.ViewerRemove(IUntypedViewerDataValue)"/>
 	public bool Remove(IUntypedViewerDataValue value)
 	{
 		return WrappedCollection.ViewerRemove(value);
@@ -111,7 +113,7 @@ public sealed class ViewerDataValueCollection : IEnumerable<IUntypedViewerDataVa
 		return WrappedCollection.Remove(name);
 	}
 
-	/// <inheritdoc cref="DataValueCollection.RemoveAll(Predicate{IUntypedDataValue})"/>
+	/// <inheritdoc cref="DataValueCollection.ViewerRemoveAll(Predicate{IUntypedViewerDataValue})"/>
 	public int RemoveAll(Predicate<IUntypedViewerDataValue> predicate)
 	{
 		return WrappedCollection.ViewerRemoveAll(predicate);

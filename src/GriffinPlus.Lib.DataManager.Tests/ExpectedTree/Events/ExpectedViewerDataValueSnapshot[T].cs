@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10,33 +10,23 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// <summary>
 /// An expected snapshot of a <see cref="ViewerDataValue{T}"/>.
 /// </summary>
-readonly struct ExpectedViewerDataValueSnapshot<T>
+readonly struct ExpectedViewerDataValueSnapshot<T>(
+	DateTime                    timestamp,
+	DataValuePropertiesInternal properties,
+	T                           value)
 {
-	/// <summary>
-	/// Initializes a new instance of the <see cref="ExpectedViewerDataValueSnapshot{T}"/> class.
-	/// </summary>
-	internal ExpectedViewerDataValueSnapshot(
-		DateTime                    timestamp,
-		DataValuePropertiesInternal properties,
-		T                           value)
-	{
-		Timestamp = timestamp;
-		mProperties = properties;
-		Value = value;
-	}
-
 	#region Timestamp
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="ViewerDataValueSnapshot{T}.Timestamp"/> property.
 	/// </summary>
-	public DateTime Timestamp { get; }
+	public DateTime Timestamp { get; } = timestamp;
 
 	#endregion
 
 	#region Properties (incl. Boolean Accessors)
 
-	private readonly DataValuePropertiesInternal mProperties;
+	private readonly DataValuePropertiesInternal mProperties = properties;
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="ViewerDataValueSnapshot{T}.Properties"/> property.
@@ -65,7 +55,7 @@ readonly struct ExpectedViewerDataValueSnapshot<T>
 	/// <summary>
 	/// Gets the expected value of the <see cref="ViewerDataValueSnapshot{T}.Value"/> property.
 	/// </summary>
-	public T Value { get; }
+	public T Value { get; } = value;
 
 	#endregion
 }

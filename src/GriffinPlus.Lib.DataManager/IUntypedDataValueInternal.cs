@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -103,19 +103,19 @@ interface IUntypedDataValueInternal : IUntypedDataValue
 	/// Marks the data value as 'detached' and resets the reference to the containing node
 	/// (for internal use only, not synchronized).
 	/// </summary>
-	void DetachFromDataTree();
+	void DetachFromDataTreeUnsynced();
 
 	/// <summary>
 	/// Re-evaluates the path of the current data value in the data tree and updates the path variable accordingly
 	/// (for internal use only, not synchronized).
 	/// </summary>
-	void UpdatePath();
+	void UpdatePathUnsynced();
 
 	/// <summary>
-	/// Updates the data tree manager.
+	/// Updates the data tree manager (for internal use only, not synchronized).
 	/// </summary>
 	/// <param name="dataTreeManager">The data tree manager to use.</param>
-	void UpdateDataTreeManager(DataTreeManager dataTreeManager);
+	void UpdateDataTreeManagerUnsynced(DataTreeManager dataTreeManager);
 
 	/// <summary>
 	/// Copies the current data value to the data value collection of the specified node

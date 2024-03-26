@@ -1,9 +1,10 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Diagnostics;
 
 namespace GriffinPlus.Lib.DataManager.Viewer;
 
@@ -15,17 +16,9 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// which is important for viewers to show the correct state of the data tree - with regular and dummy data.
 /// Modifying operations do not affect dummy nodes as dummy nodes are managed by the data tree manager.
 /// </remarks>
+[DebuggerDisplay("Name: {" + nameof(Name) + "}, Type: {" + nameof(Type) + ".FullName}, Properties: {" + nameof(Properties) + "}, Timestamp: {" + nameof(Timestamp) + "}, Value: {" + nameof(Value) + "}, Path: {" + nameof(Path) + "}")]
 public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 {
-	/// <summary>
-	/// Initializes a new <see cref="ViewerDataValue{T}"/> wrapping a <see cref="DataValue{T}"/>.
-	/// </summary>
-	/// <param name="value">The <see cref="DataValue{T}"/> to wrap.</param>
-	internal ViewerDataValue(DataValue<T> value)
-	{
-		WrappedValue = value;
-	}
-
 	/// <inheritdoc cref="DataValue{T}.ViewerChanged"/>
 	public event EventHandler<ViewerDataValueChangedEventArgs<T>> Changed
 	{
@@ -52,6 +45,15 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	{
 		add => WrappedValue.ViewerUntypedChangedAsync += value;
 		remove => WrappedValue.ViewerUntypedChangedAsync -= value;
+	}
+
+	/// <summary>
+	/// Initializes a new <see cref="ViewerDataValue{T}"/> wrapping a <see cref="DataValue{T}"/>.
+	/// </summary>
+	/// <param name="value">The <see cref="DataValue{T}"/> to wrap.</param>
+	internal ViewerDataValue(DataValue<T> value)
+	{
+		WrappedValue = value;
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.WrappedValue"/>
@@ -145,13 +147,13 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.Set(object,DataValueProperties)"/>
-	public void Set(object value, DataValueProperties properties)
+	void IUntypedViewerDataValue.Set(object value, DataValueProperties properties)
 	{
 		(WrappedValue as IUntypedDataValue).Set(value, properties);
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.Set(object,DataValueProperties,DataValueProperties)"/>
-	public void Set(object value, DataValueProperties propertiesToSet, DataValueProperties propertiesToClear)
+	void IUntypedViewerDataValue.Set(object value, DataValueProperties propertiesToSet, DataValueProperties propertiesToClear)
 	{
 		(WrappedValue as IUntypedDataValue).Set(value, propertiesToSet, propertiesToClear);
 	}
@@ -175,13 +177,13 @@ public sealed class ViewerDataValue<T> : IUntypedViewerDataValue
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.ExecuteAtomically(UntypedViewerDataValueAction)"/>
-	public void ExecuteAtomically(UntypedViewerDataValueAction action)
+	void IUntypedViewerDataValue.ExecuteAtomically(UntypedViewerDataValueAction action)
 	{
 		WrappedValue.ViewerExecuteAtomically(action);
 	}
 
 	/// <inheritdoc cref="IUntypedViewerDataValue.ExecuteAtomically{TState}(UntypedViewerDataValueAction{TState},TState)"/>
-	public void ExecuteAtomically<TState>(UntypedViewerDataValueAction<TState> action, TState state)
+	void IUntypedViewerDataValue.ExecuteAtomically<TState>(UntypedViewerDataValueAction<TState> action, TState state)
 	{
 		WrappedValue.ViewerExecuteAtomically(action, state);
 	}

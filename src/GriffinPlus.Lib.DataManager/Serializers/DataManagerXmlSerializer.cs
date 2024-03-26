@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -543,34 +543,6 @@ public partial class DataManagerXmlSerializer : DataManagerSerializerBase
 		// return object as is if it is immutable
 		if (Immutability.IsImmutable(type))
 			return obj;
-
-		throw new SerializationException($"Copying objects of type '{type.FullName}' is not supported. Consider adding a type serializer for it.");
-	}
-
-	/// <inheritdoc/>
-	public override T[] CopySerializableValue<T>(T obj, int count)
-	{
-		// abort if the object to copy is null or if count is zero
-		var copies = new T[count];
-		if (obj == null || count == 0)
-			return copies;
-
-		// other objects
-		Type type = obj.GetType();
-		if (mTypeSerializersByType.TryGetValue(type, out TypeSerializer serializer))
-		{
-			// copy the object using the registered copier callback of the type
-			for (int i = 0; i < count; i++) copies[i] = (T)serializer.CopierCallback(obj);
-			return copies;
-		}
-
-		// handle null and immutable objects
-		if (Immutability.IsImmutable(type))
-		{
-			// copy the object using the registered copier callback of the type
-			for (int i = 0; i < count; i++) copies[i] = obj;
-			return copies;
-		}
 
 		throw new SerializationException($"Copying objects of type '{type.FullName}' is not supported. Consider adding a type serializer for it.");
 	}

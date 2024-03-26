@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,13 +25,13 @@ namespace GriffinPlus.Lib.DataManager;
 /// A collection containing values in a data node.
 /// </summary>
 [InternalObjectSerializer(1)]
+[DebuggerDisplay("Count: {" + nameof(Count) + "}")]
 public partial class DataValueCollection :
 	IEnumerable<IUntypedDataValue>,
 	IInternalObjectSerializer
 {
-	private readonly DataNode                               mNode;   // node containing the collection
-	private readonly List<IUntypedDataValueInternal>        mBuffer; // list storing the nodes
-	private          IEnumerable<IUntypedDataValueInternal> RegularValuesOnly => mBuffer.Where(x => !x.IsDummyUnsynced);
+	private readonly DataNode                        mNode;   // node containing the collection
+	private readonly List<IUntypedDataValueInternal> mBuffer; // list storing the nodes
 
 	#region Changed / ChangedAsync
 
@@ -58,7 +58,7 @@ public partial class DataValueCollection :
 					true,
 					true,
 					this,
-					new DataValueCollectionChangedEventArgs(mNode, RegularValuesOnly));
+					new DataValueCollectionChangedEventArgs(mNode, RegularValuesOnlyUnsynced));
 			}
 		}
 
@@ -88,7 +88,7 @@ public partial class DataValueCollection :
 					true,
 					true,
 					this,
-					new DataValueCollectionChangedEventArgs(mNode, RegularValuesOnly));
+					new DataValueCollectionChangedEventArgs(mNode, RegularValuesOnlyUnsynced));
 			}
 		}
 
@@ -219,7 +219,7 @@ public partial class DataValueCollection :
 		{
 			lock (mNode.DataTreeManager.Sync)
 			{
-				return RegularValuesOnly.Count();
+				return RegularValuesOnlyUnsynced.Count();
 			}
 		}
 	}
@@ -248,6 +248,22 @@ public partial class DataValueCollection :
 
 	#endregion
 
+	#region RegularValuesOnlyUnsynced
+
+	/// <summary>
+	/// Gets all regular data values in the collection (for internal use only, not synchronized).
+	/// </summary>
+	private IEnumerable<IUntypedDataValueInternal> RegularValuesOnlyUnsynced
+	{
+		get
+		{
+			Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+			return mBuffer.Where(x => !x.IsDummyUnsynced);
+		}
+	}
+
+	#endregion
+
 	#region Add(...) / AddDynamically(...)
 
 	/// <summary>
@@ -262,8 +278,7 @@ public partial class DataValueCollection :
 				     x.GetParameters().Length == 3 &&
 				     x.GetParameters()[0].ParameterType == typeof(string) &&
 				     x.GetParameters()[1].ParameterType == typeof(DataValueProperties) &&
-				     x.GetParameters()[2].ParameterType.IsGenericParameter &&
-				     x.GetParameters()[2].ParameterType.GenericParameterPosition == 0);
+				     x.GetParameters()[2].ParameterType.IsGenericParameter);
 
 	/// <summary>
 	/// Adds a data value to the collection
@@ -414,10 +429,10 @@ public partial class DataValueCollection :
 		// make nodes regular and persistent up to the root node, if necessary...
 		if ((properties & DataValuePropertiesInternal.Dummy) == 0)
 		{
-			mNode.Regularize();
+			mNode.RegularizeUnsynced();
 			if ((properties & DataValuePropertiesInternal.Persistent) != 0)
 			{
-				mNode.MakePersistent();
+				mNode.MakePersistentUnsynced();
 			}
 		}
 
@@ -522,7 +537,7 @@ public partial class DataValueCollection :
 			}
 
 			// the removed value is detached from the tree now...
-			dataValue.DetachFromDataTree();
+			dataValue.DetachFromDataTreeUnsynced();
 		}
 
 		// register previously removed data value references
@@ -556,8 +571,8 @@ public partial class DataValueCollection :
 			foreach (IUntypedDataValueInternal dataValue in CollectionsMarshal.AsSpan(mBuffer))
 #endif
 			{
-				if (dataValue.NameUnsynced != name) continue;
 				if (dataValue.IsDummyUnsynced) continue;
+				if (dataValue.NameUnsynced != name) continue;
 				return true;
 			}
 			return false;
@@ -583,7 +598,7 @@ public partial class DataValueCollection :
 		lock (mNode.DataTreeManager.Sync)
 		{
 			return new MonitorSynchronizedEnumerator<IUntypedDataValue>(
-				mBuffer.GetEnumerator(),
+				RegularValuesOnlyUnsynced.GetEnumerator(),
 				mNode.DataTreeManager.Sync);
 		}
 	}
@@ -854,7 +869,7 @@ public partial class DataValueCollection :
 			// unregistering did not remove the data value as it is regular
 			// => remove data value from the collection and detach it from the data tree
 			mBuffer.RemoveAt(index);
-			dataValue.DetachFromDataTree();
+			dataValue.DetachFromDataTreeUnsynced();
 		}
 
 		// register previously removed data value references
@@ -904,7 +919,7 @@ public partial class DataValueCollection :
 	{
 		lock (mNode.DataTreeManager.Sync)
 		{
-			return [.. RegularValuesOnly];
+			return [.. RegularValuesOnlyUnsynced];
 		}
 	}
 
@@ -963,17 +978,17 @@ public partial class DataValueCollection :
 	/// <summary>
 	/// Reinitializes the path variable (for internal use only, not synchronized).
 	/// </summary>
-	internal void ReinitializePathsRecursivelyUnsynced()
+	internal void ReinitializeDataValuePathsUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
-		mBuffer.ForEach(dataValue => dataValue.UpdatePath());
+		mBuffer.ForEach(dataValue => dataValue.UpdatePathUnsynced());
 	}
 
 	/// <summary>
 	/// Updates the data tree manager of all data values.
 	/// </summary>
 	/// <param name="dataTreeManager">The data tree manager to use.</param>
-	internal void UpdateDataTreeManagerRecursivelyUnsynced(DataTreeManager dataTreeManager)
+	internal void UpdateDataTreeManagerUnsynced(DataTreeManager dataTreeManager)
 	{
 		Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -983,7 +998,7 @@ public partial class DataValueCollection :
 		foreach (IUntypedDataValueInternal dataValue in CollectionsMarshal.AsSpan(mBuffer))
 #endif
 		{
-			dataValue.UpdateDataTreeManager(dataTreeManager);
+			dataValue.UpdateDataTreeManagerUnsynced(dataTreeManager);
 		}
 	}
 
@@ -1013,7 +1028,7 @@ public partial class DataValueCollection :
 	/// <remarks>
 	/// If a flag is specified both 'set' and 'cleared', it will be finally set.
 	/// </remarks>
-	internal void SetPropertiesRecursivelyUnsynced(
+	internal void SetPropertiesOfDataValuesUnsynced(
 		DataValuePropertiesInternal valuePropertiesToSet,
 		DataValuePropertiesInternal valuePropertiesToClear)
 	{

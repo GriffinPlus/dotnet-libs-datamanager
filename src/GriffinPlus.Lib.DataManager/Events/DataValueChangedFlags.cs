@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ public enum DataValueChangedFlags
 	/// <summary>
 	/// All flags (except <see cref="InitialUpdate"/>).
 	/// </summary>
-	All = IsPersistent | IsDetached | Properties | Value | Timestamp | Name | Path,
+	All = DataValueChangedFlagsInternal.AllUserFlags,
 
 	/// <summary>
 	/// This flag indicates that this is the first update to a monitored data value.

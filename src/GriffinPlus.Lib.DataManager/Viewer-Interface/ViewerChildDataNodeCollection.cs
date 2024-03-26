@@ -1,11 +1,12 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GriffinPlus.Lib.DataManager.Viewer;
 
@@ -17,17 +18,9 @@ namespace GriffinPlus.Lib.DataManager.Viewer;
 /// which is important for viewers to show the correct state of the data tree - with regular and dummy data.
 /// Modifying operations do not affect dummy nodes as dummy nodes are managed by the data tree manager.
 /// </remarks>
+[DebuggerDisplay("Count: {" + nameof(Count) + "}")]
 public sealed class ViewerChildDataNodeCollection : IEnumerable<ViewerDataNode>
 {
-	/// <summary>
-	/// Initializes a new <see cref="ViewerChildDataNodeCollection"/> wrapping a <see cref="ChildDataNodeCollection"/>.
-	/// </summary>
-	/// <param name="collection">The <see cref="ChildDataNodeCollection"/> to wrap.</param>
-	internal ViewerChildDataNodeCollection(ChildDataNodeCollection collection)
-	{
-		WrappedCollection = collection;
-	}
-
 	/// <inheritdoc cref="ChildDataNodeCollection.ViewerChanged"/>
 	public event EventHandler<ViewerDataNodeCollectionChangedEventArgs> Changed
 	{
@@ -40,6 +33,15 @@ public sealed class ViewerChildDataNodeCollection : IEnumerable<ViewerDataNode>
 	{
 		add => WrappedCollection.ViewerChangedAsync += value;
 		remove => WrappedCollection.ViewerChangedAsync -= value;
+	}
+
+	/// <summary>
+	/// Initializes a new <see cref="ViewerChildDataNodeCollection"/> wrapping a <see cref="ChildDataNodeCollection"/>.
+	/// </summary>
+	/// <param name="collection">The <see cref="ChildDataNodeCollection"/> to wrap.</param>
+	internal ViewerChildDataNodeCollection(ChildDataNodeCollection collection)
+	{
+		WrappedCollection = collection;
 	}
 
 	/// <summary>

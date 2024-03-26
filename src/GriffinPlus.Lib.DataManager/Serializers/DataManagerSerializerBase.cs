@@ -1,10 +1,9 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Diagnostics;
 using System.IO;
 
 // ReSharper disable CompareNonConstrainedGenericWithNull
@@ -38,26 +37,6 @@ public abstract class DataManagerSerializerBase : IDataManagerSerializer
 	}
 
 	/// <inheritdoc/>
-	public virtual T[] CopySerializableValue<T>(T obj, int count)
-	{
-		// abort if the object to copy is null or nothing at all
-		var copies = new T[count];
-		if (obj == null || count == 0)
-			return copies;
-
-		// handle null and immutable objects
-		Type type = obj.GetType();
-		if (Immutability.IsImmutable(type))
-		{
-			// copy the object using the registered copier callback of the type
-			for (int i = 0; i < count; i++) copies[i] = obj;
-			return copies;
-		}
-
-		throw new SerializationException($"Copying objects of type '{type.FullName}' is not supported. Consider adding a type serializer for it.");
-	}
-
-	/// <inheritdoc/>
 	public abstract void Serialize(DataNode node, Stream stream);
 
 	/// <inheritdoc/>
@@ -70,9 +49,8 @@ public abstract class DataManagerSerializerBase : IDataManagerSerializer
 		if (fileName == null) throw new ArgumentNullException(nameof(fileName));
 
 		// determine the full path of the file and create the directory, if necessary
-		string fullPath = Path.GetFullPath(fileName);
-		string directoryPath = Path.GetDirectoryName(fullPath);
-		Debug.Assert(directoryPath != null);
+		string fullPath = Path.GetFullPath(fileName); // throws ArgumentException if the specified file name is invalid
+		string directoryPath = Path.GetDirectoryName(fullPath) ?? throw new ArgumentException("The specified file name must not be the root directory.", nameof(fileName));
 		Directory.CreateDirectory(directoryPath);
 
 		// serialize the data tree to the file
@@ -87,7 +65,7 @@ public abstract class DataManagerSerializerBase : IDataManagerSerializer
 		if (fileName == null) throw new ArgumentNullException(nameof(fileName));
 
 		// deserialize the data tree from the file
-		string fullPath = Path.GetFullPath(fileName);
+		string fullPath = Path.GetFullPath(fileName); // throws ArgumentException if the specified file name is invalid
 		using var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 		using var stream = new BufferedStream(fileStream, SerializationStreamBufferSize);
 		return Deserialize(stream, dataTreeManagerHost);

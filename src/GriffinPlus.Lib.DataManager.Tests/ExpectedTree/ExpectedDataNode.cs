@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -18,7 +16,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// <summary>
 /// An expected data node.
 /// </summary>
-[DebuggerDisplay("Data Node => Name: {Name} | Properties: {Properties} | Path: {Path}")]
+[DebuggerDisplay("Name: {" + nameof(Name) + "} | Properties: {" + nameof(Properties) + "} | Path: {" + nameof(Path) + "}")]
 partial class ExpectedDataNode : ExpectedItem
 {
 	/// <summary>
@@ -32,8 +30,8 @@ partial class ExpectedDataNode : ExpectedItem
 		ActualDataNode = actualDataNode;
 		Name = name;
 		mProperties = properties;
-		mChildren.CollectionChanged += EH_Children_CollectionChanged;
-		mValues.CollectionChanged += EH_Values_CollectionChanged;
+		Children = [];
+		Values = [];
 	}
 
 	#region ActualDataNode
@@ -51,78 +49,18 @@ partial class ExpectedDataNode : ExpectedItem
 			if (mActualDataNode == value)
 				return;
 
-			// unregister event handlers from the old data node
-			if (mActualDataNode != null)
-			{
-				mActualDataNode.Changed -= ChangedHandler;
-				mActualDataNode.ChangedAsync -= ChangedAsyncHandler;
-				mActualDataNode.ViewerChanged -= ViewerChangedHandler;
-				mActualDataNode.ViewerChangedAsync -= ViewerChangedAsyncHandler;
-			}
+			// unregister event handlers bound to the old data node recursively
+			UnregisterEventsRecursively();
 
+			// set the actual data node and bind its collection as well
 			mActualDataNode = value;
+			mChildren.ActualCollection = mActualDataNode?.Children;
+			mValues.ActualCollection = mActualDataNode?.Values;
 
 			// clear all expected and received events before registering any event of the new node
 			// (the node will immediately fire an initial changed event...)
-			ResetExpectedEvents(false);
-			ResetReceivedEvents(false);
-
-			// register event handlers at the new data node
-			// ReSharper disable once InvertIf
-			if (mActualDataNode != null)
-			{
-				// add expected initial 'Changed' event
-				mExpectedChangedEvents.Add(
-					new ExpectedChangedEventItem(
-						nameof(DataNode.Changed),
-						mActualDataNode,
-						new ExpectedDataNodeChangedEventArgs(
-							mActualDataNode,
-							new ExpectedDataNodeSnapshot(Name, Path, mProperties),
-							DataNodeChangedFlags.All | DataNodeChangedFlags.InitialUpdate)));
-
-				// register 'Changed' event
-				mActualDataNode.Changed += ChangedHandler;
-
-				// add expected initial 'ChangedAsync' event
-				mExpectedChangedAsyncEvents.Add(
-					new ExpectedChangedEventItem(
-						nameof(DataNode.ChangedAsync),
-						mActualDataNode,
-						new ExpectedDataNodeChangedEventArgs(
-							mActualDataNode,
-							new ExpectedDataNodeSnapshot(Name, Path, mProperties),
-							DataNodeChangedFlags.All | DataNodeChangedFlags.InitialUpdate)));
-
-				// register 'ChangedAsync' event
-				mActualDataNode.ChangedAsync += ChangedAsyncHandler;
-
-				// add expected initial 'ViewerChanged' event
-				mExpectedViewerChangedEvents.Add(
-					new ExpectedViewerChangedEventItem(
-						nameof(DataNode.ViewerChanged),
-						mActualDataNode.ViewerWrapper,
-						new ExpectedViewerDataNodeChangedEventArgs(
-							mActualDataNode.ViewerWrapper,
-							new ExpectedViewerDataNodeSnapshot(Name, Path, mProperties),
-							ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate)));
-
-				// register 'ViewerChanged' event
-				mActualDataNode.ViewerChanged += ViewerChangedHandler;
-
-				// add expected initial 'ViewerChangedAsync' event
-				mExpectedViewerChangedAsyncEvents.Add(
-					new ExpectedViewerChangedEventItem(
-						nameof(DataNode.ViewerChangedAsync),
-						mActualDataNode.ViewerWrapper,
-						new ExpectedViewerDataNodeChangedEventArgs(
-							mActualDataNode.ViewerWrapper,
-							new ExpectedViewerDataNodeSnapshot(Name, Path, mProperties),
-							ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate)));
-
-				// register 'ViewerChangedAsync' event
-				mActualDataNode.ViewerChangedAsync += ViewerChangedAsyncHandler;
-			}
+			ResetExpectedEvents(recursive: false);
+			ResetReceivedEvents(recursive: false);
 		}
 	}
 
@@ -130,64 +68,30 @@ partial class ExpectedDataNode : ExpectedItem
 
 	#region Children
 
-	private ObservableCollection<ExpectedDataNode> mChildren = [];
+	private ExpectedChildDataNodeCollection mChildren;
 
 	/// <summary>
 	/// Gets or sets the child data nodes of the current expected data node.
 	/// </summary>
-	public ObservableCollection<ExpectedDataNode> Children
+	public ExpectedChildDataNodeCollection Children
 	{
 		get => mChildren;
 		set
 		{
-			mChildren.CollectionChanged -= EH_Children_CollectionChanged;
+			if (mChildren != null)
+			{
+				mChildren.Parent = null;
+				mChildren.ActualCollection = null;
+			}
+
 			mChildren = value;
-			mChildren.CollectionChanged += EH_Children_CollectionChanged;
-			SetParentToThis(mChildren);
-		}
-	}
 
-	private void EH_Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-	{
-		switch (e.Action)
-		{
-			// add: some items have been added
-			// => add parent to new items
-			case NotifyCollectionChangedAction.Add:
-				SetParentToThis(e.NewItems!.Cast<IExpectedItem>());
-				break;
-
-			// remove: some items have been removed
-			// => reset parent of old items
-			case NotifyCollectionChangedAction.Remove:
-				ResetParent(e.OldItems!.Cast<IExpectedItem>());
-				break;
-
-			// replace: some items are replaced with other items
-			// => reset parent of old items and set parent for new items
-			case NotifyCollectionChangedAction.Replace:
-				ResetParent(e.OldItems!.Cast<IExpectedItem>());
-				SetParentToThis(e.NewItems!.Cast<IExpectedItem>());
-				break;
-
-			// move: no items added/removed
-			// => nothing to do
-			case NotifyCollectionChangedAction.Move:
-				break;
-
-			// reset: everything (might) have changed
-			// => process all items in the collection
-			// NOTE: the parent of old items is not cleared!!!
-			case NotifyCollectionChangedAction.Reset:
-				SetParentToThis(mChildren);
-				break;
-
-			// unhandled action
-			default:
-				throw new ArgumentOutOfRangeException(
-					nameof(e),
-					e.Action,
-					"The value of the NotifyCollectionChangedEventArgs.Action property is unhandled.");
+			// ReSharper disable once InvertIf
+			if (mChildren != null)
+			{
+				mChildren.Parent = this;
+				mChildren.ActualCollection = ActualDataNode?.Children;
+			}
 		}
 	}
 
@@ -266,13 +170,14 @@ partial class ExpectedDataNode : ExpectedItem
 						new ExpectedViewerDataNodeSnapshot(Name, Path, mProperties),
 						viewerChangedFlags)));
 
-			// update paths of child nodes a data values, if the change affected a non-root node
+			// update paths of child nodes a data values,
+			// if the change affected a node other than the root node
 			// ------------------------------------------------------------------------------------
 			// ReSharper disable once InvertIf
 			if (Parent != null)
 			{
-				foreach (ExpectedDataNode dataNode in Children) dataNode.NotifyPathChanged();
-				foreach (IExpectedUntypedDataValue dataValue in Values) dataValue.NotifyPathChanged();
+				Children.NotifyPathChanged();
+				Values.NotifyPathChanged();
 			}
 		}
 	}
@@ -444,64 +349,30 @@ partial class ExpectedDataNode : ExpectedItem
 
 	#region Values
 
-	private ObservableCollection<IExpectedUntypedDataValue> mValues = [];
+	private ExpectedDataValueCollection mValues;
 
 	/// <summary>
-	/// Gets or sets the data values of the current expected data node.
+	/// Gets or sets the child data nodes of the current expected data node.
 	/// </summary>
-	public ObservableCollection<IExpectedUntypedDataValue> Values
+	public ExpectedDataValueCollection Values
 	{
 		get => mValues;
 		set
 		{
-			mValues.CollectionChanged -= EH_Values_CollectionChanged;
+			if (mValues != null)
+			{
+				mValues.Parent = null;
+				mValues.ActualCollection = null;
+			}
+
 			mValues = value;
-			mValues.CollectionChanged += EH_Values_CollectionChanged;
-			SetParentToThis(mValues);
-		}
-	}
 
-	private void EH_Values_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-	{
-		switch (e.Action)
-		{
-			// add: some items have been added
-			// => add parent to new items
-			case NotifyCollectionChangedAction.Add:
-				SetParentToThis(e.NewItems!.Cast<ExpectedItem>());
-				break;
-
-			// remove: some items have been removed
-			// => reset parent of old items
-			case NotifyCollectionChangedAction.Remove:
-				ResetParent(e.OldItems!.Cast<ExpectedItem>());
-				break;
-
-			// replace: some items are replaced with other items
-			// => reset parent of old items and set parent for new items
-			case NotifyCollectionChangedAction.Replace:
-				ResetParent(e.OldItems!.Cast<ExpectedItem>());
-				SetParentToThis(e.NewItems!.Cast<ExpectedItem>());
-				break;
-
-			// move: no items added/removed
-			// => nothing to do
-			case NotifyCollectionChangedAction.Move:
-				break;
-
-			// reset: everything (might) have changed
-			// => process all items in the collection
-			// NOTE: the parent of old items is not cleared!!!
-			case NotifyCollectionChangedAction.Reset:
-				SetParentToThis(mValues);
-				break;
-
-			// unhandled action
-			default:
-				throw new ArgumentOutOfRangeException(
-					nameof(e),
-					e.Action,
-					"The value of the NotifyCollectionChangedEventArgs.Action property is unhandled.");
+			// ReSharper disable once InvertIf
+			if (mValues != null)
+			{
+				mValues.Parent = this;
+				mValues.ActualCollection = ActualDataNode?.Values;
+			}
 		}
 	}
 
@@ -527,7 +398,7 @@ partial class ExpectedDataNode : ExpectedItem
 	/// and sets <see cref="ActualDataNode"/> property to this data node.
 	/// </summary>
 	/// <param name="actualParent">Parent of the current node (<c>null</c> if this is the root node).</param>
-	private void InitializeActualDataNode(DataNode actualParent)
+	internal void InitializeActualDataNode(DataNode actualParent)
 	{
 		if (actualParent == null)
 		{
@@ -535,16 +406,13 @@ partial class ExpectedDataNode : ExpectedItem
 
 			lock (ActualDataNode.DataTreeManager.Sync)
 			{
-				foreach (ExpectedDataNode expectedChildNode in Children)
-				{
-					expectedChildNode.InitializeActualDataNode(ActualDataNode);
-				}
-
-				foreach (IExpectedUntypedDataValue expectedValue in Values)
-				{
-					expectedValue.InitializeActualDataValue(ActualDataNode);
-				}
+				Children.InitializeActualDataNode();
+				Values.InitializeActualDataValue();
 			}
+
+			// data tree is set up completely
+			// => register events and expect initial events to be fired
+			RegisterEventsRecursively();
 		}
 		else
 		{
@@ -552,75 +420,8 @@ partial class ExpectedDataNode : ExpectedItem
 
 			ActualDataNode = actualParent.Children.AddInternalUnsynced(Name.AsSpan(), mProperties);
 
-			foreach (ExpectedDataNode expectedChildNode in Children)
-			{
-				expectedChildNode.InitializeActualDataNode(ActualDataNode);
-			}
-
-			foreach (IExpectedUntypedDataValue expectedValue in Values)
-			{
-				expectedValue.InitializeActualDataValue(ActualDataNode);
-			}
-		}
-	}
-
-	#endregion
-
-	#region BindActualDataNode()
-
-	/// <summary>
-	/// Binds an existing actual data tree to the expected data tree and initializes the
-	/// <see cref="ActualDataNode"/> properties and <see cref="ExpectedDataValue{T}.ActualDataValue"/>
-	/// properties to link the actual data node/value to their expected equivalent.
-	/// </summary>
-	/// <param name="root">The root not of the actual data tree.</param>
-	public void BindActualDataNode(DataNode root)
-	{
-		if (Parent != null) throw new InvalidOperationException("Must be called on root nodes only!");
-		BindActualDataNodeInternal(root);
-	}
-
-	/// <summary>
-	/// Binds the specified actual node to the expected node setting the <see cref="ActualDataNode"/> property of the current node.
-	/// </summary>
-	/// <param name="actualDataNode">
-	/// The actual node corresponding to the current expected node.
-	/// </param>
-	private void BindActualDataNodeInternal(DataNode actualDataNode)
-	{
-		// the name and the path of the actual data node should match the name of the expected data node
-		Assert.Equal(Name, actualDataNode.Name);
-		Assert.Equal(Path, actualDataNode.Path);
-
-		// set the ActualDataNode properties to allow walking backward in the following
-		ActualDataNode = actualDataNode;
-
-		// bind actual child data nodes to the corresponding expected data nodes
-		ExpectedDataNode[] expectedChildren = [.. mChildren];
-		Assert.Equal(expectedChildren.Length, actualDataNode.Children.InternalBuffer.Count);
-		foreach ((ExpectedDataNode expectedChildDataNode, DataNode actualChildDataNode) in expectedChildren.Zip(
-			         actualDataNode.Children.InternalBuffer,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			// the name of the actual data node should match the name of the expected data node
-			Assert.Equal(expectedChildDataNode.Name, actualChildDataNode.Name);
-
-			// proceed binding recursively
-			expectedChildDataNode.BindActualDataNodeInternal(actualChildDataNode);
-		}
-
-		// bind actual data values to the corresponding expected data values
-		IExpectedUntypedDataValue[] expectedValues = [.. mValues];
-		Assert.Equal(expectedValues.Length, actualDataNode.Values.InternalBuffer.Count);
-		foreach ((IExpectedUntypedDataValue expectedDataValue, IUntypedDataValueInternal actualDataValue) in expectedValues.Zip(
-			         actualDataNode.Values.InternalBuffer,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			// the name of the actual data value should match the name of the expected data value
-			Assert.Equal(expectedDataValue.Name, actualDataValue.Name);
-
-			// bind the actual data value to its expected pendent
-			expectedDataValue.ActualDataValue = actualDataValue;
+			Children.InitializeActualDataNode();
+			Values.InitializeActualDataValue();
 		}
 	}
 
@@ -768,7 +569,7 @@ partial class ExpectedDataNode : ExpectedItem
 	/// <summary>
 	/// Checks whether the bound actual data tree matches the current expected data tree (for internal use only).
 	/// </summary>
-	private void AssertActualTreeEqualsExpectedTreeInternal()
+	internal void AssertActualTreeEqualsExpectedTreeInternal()
 	{
 		Debug.Assert(Monitor.IsEntered(ActualDataNode.DataTreeManager.Sync));
 
@@ -784,15 +585,7 @@ partial class ExpectedDataNode : ExpectedItem
 		Assert.Same(Parent?.ActualDataNode, ActualDataNode.Parent);
 
 		// check child nodes
-		ExpectedDataNode[] expectedChildren = mChildren.Where(x => !x.IsDummy).ToArray();
-		Assert.Equal(expectedChildren.Length, ActualDataNode.Children.Count);
-		foreach ((ExpectedDataNode expectedChildDataNode, DataNode actualChildDataNode) in expectedChildren.Zip(
-			         ActualDataNode.Children,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			Assert.Same(expectedChildDataNode.ActualDataNode, actualChildDataNode);
-			expectedChildDataNode.AssertActualTreeEqualsExpectedTreeInternal();
-		}
+		mChildren.AssertActualTreeEqualsExpectedTreeInternal();
 
 		// check values
 		IExpectedUntypedDataValue[] expectedValues = mValues.Where(x => !x.IsDummy).ToArray();
@@ -832,27 +625,9 @@ partial class ExpectedDataNode : ExpectedItem
 		Assert.Equal(RootNode.ActualDataNode.DataTreeManager, actualViewerDataNode.DataTreeManager);
 		Assert.Same(Parent?.ActualDataNode.ViewerWrapper, actualViewerDataNode.Parent);
 
-		// check child nodes
-		ExpectedDataNode[] expectedViewerChildren = [.. mChildren];
-		Assert.Equal(expectedViewerChildren.Length, actualViewerDataNode.Children.Count);
-		foreach ((ExpectedDataNode expectedChildDataNode, ViewerDataNode actualViewerChildDataNode) in expectedViewerChildren.Zip(
-			         actualViewerDataNode.Children,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			Assert.Same(expectedChildDataNode.ActualDataNode.ViewerWrapper, actualViewerChildDataNode);
-			expectedChildDataNode.AssertActualTreeEqualsExpectedTreeInternal();
-		}
-
-		// check values
-		IExpectedUntypedDataValue[] expectedViewerValues = [.. mValues];
-		Assert.Equal(expectedViewerValues.Length, actualViewerDataNode.Values.Count);
-		foreach ((IExpectedUntypedDataValue expectedDataValue, IUntypedViewerDataValue actualViewerDataValue) in expectedViewerValues.Zip(
-			         actualViewerDataNode.Values,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			Assert.Same(expectedDataValue.ActualDataValue.ViewerWrapper, actualViewerDataValue);
-			expectedDataValue.CheckViewerConsistency(actualViewerDataValue);
-		}
+		// check child nodes and values
+		mChildren.AssertActualTreeEqualsExpectedTreeInternal(actualViewerDataNode);
+		mValues.AssertActualTreeEqualsExpectedTreeInternal(actualViewerDataNode);
 	}
 
 	#endregion
@@ -862,7 +637,7 @@ partial class ExpectedDataNode : ExpectedItem
 	/// <summary>
 	/// Recursively check whether data node events and data value events were raised as expected.
 	/// </summary>
-	private void AssertExpectedEventsWereRaised()
+	internal void AssertExpectedEventsWereRaised()
 	{
 		// check whether 'Changed' events and 'ChangedAsync' events were raised properly
 		AssertExpectedChangedEventsWereRaised(mExpectedChangedEvents, ReceivedChangedEvents, SynchronizationContext.Current);
@@ -872,17 +647,9 @@ partial class ExpectedDataNode : ExpectedItem
 		AssertExpectedViewerChangedEventsWereRaised(mExpectedViewerChangedEvents, ReceivedViewerChangedEvents, SynchronizationContext.Current);
 		AssertExpectedViewerChangedEventsWereRaised(mExpectedViewerChangedAsyncEvents, ReceivedViewerChangedAsyncEvents, DataTreeManagerHost.Default.SynchronizationContext);
 
-		// check whether data value events were raised properly
-		foreach (IExpectedUntypedDataValue expectedDataValue in Values)
-		{
-			expectedDataValue.AssertExpectedEventsWereRaised();
-		}
-
-		// dive downward the data tree and check child nodes and their values
-		foreach (ExpectedDataNode expectedChildNode in Children)
-		{
-			expectedChildNode.AssertExpectedEventsWereRaised();
-		}
+		// dive downward the data tree and check that child nodes and data values have raised the expected events
+		Children.AssertExpectedEventsWereRaised();
+		Values.AssertExpectedEventsWereRaised();
 	}
 
 	/// <summary>
@@ -951,59 +718,6 @@ partial class ExpectedDataNode : ExpectedItem
 			Assert.Equal(expected.EventArgs.Snapshot.IsPersistent, actual.EventArgs.Snapshot.IsPersistent);
 			Assert.Equal(expected.EventArgs.Snapshot.IsDummy, actual.EventArgs.Snapshot.IsDummy);
 			Assert.Equal(expected.EventArgs.ChangeFlags, actual.EventArgs.ChangeFlags);
-		}
-	}
-
-	#endregion
-
-	#region BindActualDataTree(DataNode root)
-
-	/// <summary>
-	/// Binds the specified actual data node to the current expected node.
-	/// </summary>
-	/// <param name="root">Actual data node to compare the current expected data node with.</param>
-	public void BindActualDataTree(DataNode root)
-	{
-		if (Parent != null) throw new InvalidOperationException("Must be called on root nodes only!");
-
-		lock (root.DataTreeManager.Sync)
-		{
-			BindActualDataTreeInternal(root);
-		}
-	}
-
-	/// <summary>
-	/// Binds the specified actual data node to the current expected node (for internal use only).
-	/// </summary>
-	/// <param name="actualDataNode">Actual data node to bind to the expected data node.</param>
-	private void BindActualDataTreeInternal(DataNode actualDataNode)
-	{
-		Debug.Assert(Monitor.IsEntered(actualDataNode.DataTreeManager.Sync));
-
-		// set the actual data node to allow walking up the tree later on
-		ActualDataNode = actualDataNode;
-
-		// bind child nodes
-		ExpectedDataNode[] expectedChildren = mChildren.Where(x => !x.IsDummy).ToArray();
-		Assert.Equal(expectedChildren.Length, actualDataNode.Children.Count);
-		foreach ((ExpectedDataNode expectedChildDataNode, DataNode actualChildDataNode) in expectedChildren.Zip(
-			         actualDataNode.Children,
-			         (expected, actual) => (Expected: expected, Actual: actual)))
-		{
-			Assert.Equal(expectedChildDataNode.Name, actualChildDataNode.Name);
-			expectedChildDataNode.BindActualDataTreeInternal(actualChildDataNode);
-		}
-
-		// check values
-		IExpectedUntypedDataValue[] expectedValues = mValues.Where(x => !x.IsDummy).ToArray();
-		Assert.Equal(expectedValues.Length, actualDataNode.Children.Count);
-		foreach ((IExpectedUntypedDataValue expectedDataValue, IUntypedDataValueInternal actualDataValue) in expectedValues.Zip(
-			         actualDataNode.Values,
-			         (expected, actual) => (Expected: expected, Actual: (IUntypedDataValueInternal)actual)))
-		{
-			Assert.Equal(expectedDataValue.Name, actualDataValue.Name);
-			Assert.Equal(expectedDataValue.Type, actualDataValue.Type);
-			expectedDataValue.BindAndValidateActualDataTreeInternal(actualDataValue);
 		}
 	}
 
@@ -1103,6 +817,91 @@ partial class ExpectedDataNode : ExpectedItem
 	}
 
 	/// <summary>
+	/// Registers all events of the actual data node, its child node collection,
+	/// its data value collection and data nodes and data values within them recursively.
+	/// </summary>
+	internal void RegisterEventsRecursively()
+	{
+		Assert.NotNull(mActualDataNode);
+
+		// register 'Changed' event
+		mActualDataNode.Changed += ChangedHandler;
+
+		// add expected initial 'Changed' event
+		mExpectedChangedEvents.Add(
+			new ExpectedChangedEventItem(
+				nameof(DataNode.Changed),
+				mActualDataNode,
+				new ExpectedDataNodeChangedEventArgs(
+					mActualDataNode,
+					new ExpectedDataNodeSnapshot(Name, Path, mProperties),
+					DataNodeChangedFlags.All | DataNodeChangedFlags.InitialUpdate)));
+
+		// register 'ChangedAsync' event
+		mActualDataNode.ChangedAsync += ChangedAsyncHandler;
+
+		// add expected initial 'ChangedAsync' event
+		mExpectedChangedAsyncEvents.Add(
+			new ExpectedChangedEventItem(
+				nameof(DataNode.ChangedAsync),
+				mActualDataNode,
+				new ExpectedDataNodeChangedEventArgs(
+					mActualDataNode,
+					new ExpectedDataNodeSnapshot(Name, Path, mProperties),
+					DataNodeChangedFlags.All | DataNodeChangedFlags.InitialUpdate)));
+
+		// register 'ViewerChanged' event
+		mActualDataNode.ViewerChanged += ViewerChangedHandler;
+
+		// add expected initial 'ViewerChanged' event
+		mExpectedViewerChangedEvents.Add(
+			new ExpectedViewerChangedEventItem(
+				nameof(DataNode.ViewerChanged),
+				mActualDataNode.ViewerWrapper,
+				new ExpectedViewerDataNodeChangedEventArgs(
+					mActualDataNode.ViewerWrapper,
+					new ExpectedViewerDataNodeSnapshot(Name, Path, mProperties),
+					ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate)));
+
+		// register 'ViewerChangedAsync' event
+		mActualDataNode.ViewerChangedAsync += ViewerChangedAsyncHandler;
+
+		// add expected initial 'ViewerChangedAsync' event
+		mExpectedViewerChangedAsyncEvents.Add(
+			new ExpectedViewerChangedEventItem(
+				nameof(DataNode.ViewerChangedAsync),
+				mActualDataNode.ViewerWrapper,
+				new ExpectedViewerDataNodeChangedEventArgs(
+					mActualDataNode.ViewerWrapper,
+					new ExpectedViewerDataNodeSnapshot(Name, Path, mProperties),
+					ViewerDataNodeChangedFlags.All | ViewerDataNodeChangedFlags.InitialUpdate)));
+
+		// register events downstream
+		Children.RegisterEventsRecursively();
+		Values.RegisterEventsRecursively();
+	}
+
+	/// <summary>
+	/// Unregisters all events of the actual data node and all data nodes and data values within them recursively.
+	/// </summary>
+	internal void UnregisterEventsRecursively()
+	{
+		// abort if no actual data node is set
+		if (mActualDataNode == null)
+			return;
+
+		// unregister collection events
+		mActualDataNode.Changed -= ChangedHandler;
+		mActualDataNode.ChangedAsync -= ChangedAsyncHandler;
+		mActualDataNode.ViewerChanged -= ViewerChangedHandler;
+		mActualDataNode.ViewerChangedAsync -= ViewerChangedAsyncHandler;
+
+		// unregister events downstream
+		Children.UnregisterEventsRecursively();
+		Values.UnregisterEventsRecursively();
+	}
+
+	/// <summary>
 	/// Clears the lists of received events.
 	/// </summary>
 	/// <param name="recursive">
@@ -1116,18 +915,12 @@ partial class ExpectedDataNode : ExpectedItem
 		mExpectedViewerChangedEvents.Clear();
 		mExpectedViewerChangedAsyncEvents.Clear();
 
+		mChildren.ResetExpectedEvents(recursive);
+
 		if (!recursive)
 			return;
 
-		foreach (ExpectedDataNode child in Children)
-		{
-			child.ResetExpectedEvents();
-		}
-
-		foreach (IExpectedUntypedDataValue value in Values)
-		{
-			value.ResetExpectedEvents();
-		}
+		mValues.ResetExpectedEvents(recursive);
 	}
 
 	/// <summary>
@@ -1147,15 +940,8 @@ partial class ExpectedDataNode : ExpectedItem
 		if (!recursive)
 			return;
 
-		foreach (ExpectedDataNode child in Children)
-		{
-			child.ResetReceivedEvents();
-		}
-
-		foreach (IExpectedUntypedDataValue value in Values)
-		{
-			value.ResetReceivedEvents();
-		}
+		Children.ResetReceivedEvents();
+		Values.ResetReceivedEvents();
 	}
 
 	private void ChangedHandler(object sender, DataNodeChangedEventArgs e)
@@ -1229,36 +1015,6 @@ partial class ExpectedDataNode : ExpectedItem
 		catch (ObjectDisposedException)
 		{
 			// swallow...
-		}
-	}
-
-	/// <summary>
-	/// Sets the parent node for all specified items.
-	/// </summary>
-	/// <param name="items">Items to set the parent for.</param>
-	private void SetParentToThis(IEnumerable<IExpectedItem> items)
-	{
-		if (items == null)
-			return;
-
-		foreach (IExpectedItem item in items)
-		{
-			item.Parent = this;
-		}
-	}
-
-	/// <summary>
-	/// Resets the parent node for all specified items.
-	/// </summary>
-	/// <param name="items">Items to reset the parent for.</param>
-	private static void ResetParent(IEnumerable<IExpectedItem> items)
-	{
-		if (items == null)
-			return;
-
-		foreach (IExpectedItem item in items)
-		{
-			item.Parent = null;
 		}
 	}
 
@@ -1424,10 +1180,7 @@ partial class ExpectedDataNode : ExpectedItem
 
 		// let child nodes add their events
 		// ------------------------------------------------------------------------------------
-		foreach (ExpectedDataNode dataNode in Children)
-		{
-			dataNode.NotifyPathChanged();
-		}
+		Children.NotifyPathChanged();
 	}
 
 	#endregion

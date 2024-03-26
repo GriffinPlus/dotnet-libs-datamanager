@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -12,7 +12,7 @@ using GriffinPlus.Lib.Serialization;
 
 using Xunit;
 
-#pragma warning disable IDE0090 // Use 'new(...)'
+#pragma warning disable xUnit1042 // The member referenced by the MemberData attribute returns untyped data rows
 
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 

@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -120,10 +120,10 @@ static class PathHelpers
 					reader.CopyTo(writer);
 					writer = writer[reader.Length..];
 					reader = reader[reader.Length..];
+					continue;
 				}
 
 				// escape separator
-				if (index < 0) continue;
 				writer[0] = EscapeChar;
 				writer[1] = SeparatorChar;
 				writer = writer[2..];
@@ -175,7 +175,7 @@ static class PathHelpers
 	internal static bool IsValidNameChar(char character)
 	{
 		if (character >= 0x0000 && character <= 0x001F) return false; // c0 control ([0x0000..0x001F])
-		return character < 0x0080 || character > 0x009F;              // c1 control ([0x0080..0x009F])
+		return character < 0x007F || character > 0x009F;              // 0x7F (DEL) + c1 control ([0x0080..0x009F])
 	}
 
 	#endregion

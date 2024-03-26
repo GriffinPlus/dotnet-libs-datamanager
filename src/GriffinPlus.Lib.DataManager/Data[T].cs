@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -169,7 +169,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 		mProperties = mDataValue.PropertiesUnsynced;
 		mValue = mDataValue.ValueUnsynced;
 
-		// raise the 'Changed' event, if necessary
+		// raise the 'Changed' event and 'ChangedAsync' event, if necessary
 		if (EventManager<DataChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
 			EventManager<DataChangedEventArgs<T>>.FireEvent(
@@ -181,7 +181,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 					(DataChangedFlags)(changedFlags & DataValueChangedFlagsInternal.AllUserFlags)));
 		}
 
-		// raise the 'UntypedChanged' event, if necessary
+		// raise the 'UntypedChanged' event and 'UntypedChangedAsync' event, if necessary
 		if (EventManager<UntypedDataChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
 			EventManager<UntypedDataChangedEventArgs>.FireEvent(
@@ -256,8 +256,8 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	private DataValue<T> mDataValue;
 
 	/// <summary>
-	/// Gets the referenced data value
-	/// (<c>null</c> if the link between the data value reference and its data tree is broken).
+	/// Gets the referenced data value (<c>null</c> if the link between the data value reference and its data tree is broken).<br/>
+	/// For internal use only, not synchronized.
 	/// </summary>
 	internal DataValue<T> DataValueUnsynced
 	{
@@ -368,7 +368,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDataValue == null) throw new DataValueReferenceBrokenException();
 
 				// set properties in the data value
-				// (fires 'Changed' event that updates mProperties)
+				// (fires the 'ChangedInternal' event that updates mProperties)
 				Debug.Assert(mProperties == mDataValue.PropertiesUnsynced);
 				mDataValue.PropertiesUnsynced = (mProperties & ~DataValuePropertiesInternal.UserProperties) |
 				                                ((DataValuePropertiesInternal)value & DataValuePropertiesInternal.UserProperties);
@@ -412,7 +412,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDataValue == null) throw new DataValueReferenceBrokenException();
 
 				// set properties in the data value
-				// (fires 'Changed' event that updates mProperties)
+				// (fires events that updates mProperties)
 				Debug.Assert(mProperties == mDataValue.PropertiesUnsynced);
 				mDataValue.PropertiesUnsynced = value
 					                                ? mProperties | DataValuePropertiesInternal.Persistent
@@ -526,7 +526,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				if (mDisposed) throw new ObjectDisposedException(null);
 				if (mDataValue == null) throw new DataValueReferenceBrokenException();
 
-				mDataValue.ValueUnsynced = newValue; // fires 'Changed' event that updates mValue
+				mDataValue.ValueUnsynced = newValue; // fires 'ChangedInternal' event that updates mValue
 			}
 		}
 	}
@@ -649,10 +649,11 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 			if (mDataValue == null) throw new DataValueReferenceBrokenException();
 
 			// set value and user properties, but preserve administrative flags
-			// (fires 'Changed' event that updates mTimestamp, mProperties and mValue)
-			DataValuePropertiesInternal internalPropertiesToSet = (DataValuePropertiesInternal)propertiesToSet | (mDataValue.PropertiesUnsynced & ~DataValuePropertiesInternal.UserProperties);
-			DataValuePropertiesInternal internalPropertiesToClear = (DataValuePropertiesInternal)propertiesToClear | DataValuePropertiesInternal.UserProperties;
-			mDataValue.SetUnsynced(newValue, internalPropertiesToSet, internalPropertiesToClear);
+			// (fires 'ChangedInternal' event that updates mTimestamp, mProperties and mValue)
+			mDataValue.SetUnsynced(
+				newValue,
+				(DataValuePropertiesInternal)propertiesToSet,
+				(DataValuePropertiesInternal)propertiesToClear);
 		}
 	}
 
@@ -675,7 +676,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	private bool mSuppressedNotHealthyNotification;
 
 	/// <inheritdoc/>
-	IUntypedDataValueInternal IUntypedDataInternal.UpdateDataValueReference()
+	IUntypedDataValueInternal IUntypedDataInternal.UpdateDataValueReferenceUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(RootNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -713,7 +714,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 		if (ReferenceEquals(newDataValue, mDataValue))
 			return mDataValue;
 
-		// unregister 'Changed' event from the old data value
+		// unregister 'ChangedInternal' event from the old data value
 		if (mDataValue != null) mDataValue.ChangedInternal -= EH_ChangedInternal;
 
 		// bind the new data value to the reference
@@ -728,7 +729,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	}
 
 	/// <inheritdoc/>
-	IUntypedDataValueInternal IUntypedDataInternal.InvalidateDataValueReference(bool suppressChangedEvent)
+	IUntypedDataValueInternal IUntypedDataInternal.InvalidateDataValueReferenceUnsynced(bool suppressChangedEvent)
 	{
 		Debug.Assert(Monitor.IsEntered(RootNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -736,7 +737,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 		if (mDataValue == null)
 			return null;
 
-		// unregister 'Changed' event from referenced data value
+		// unregister 'ChangedInternal' event from referenced data value
 		mDataValue.ChangedInternal -= EH_ChangedInternal;
 
 		// notify registered clients of the change, if appropriate
@@ -756,7 +757,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 	/// <param name="changedFlags">Flags indicating the changes.</param>
 	private void RaiseChangedEvents(DataChangedFlags changedFlags)
 	{
-		// raise 'Changed' event
+		// raise 'Changed' event and 'ChangedAsync' event
 		if (EventManager<DataChangedEventArgs<T>>.IsHandlerRegistered(this, ChangedEventName))
 		{
 			EventManager<DataChangedEventArgs<T>>.FireEvent(
@@ -766,7 +767,7 @@ public sealed class Data<T> : IUntypedDataInternal, IDisposable
 				new DataChangedEventArgs<T>(this, changedFlags));
 		}
 
-		// raise 'UntypedChanged' event
+		// raise 'UntypedChanged' event and 'UntypedChangedAsync' event
 		if (EventManager<UntypedDataChangedEventArgs>.IsHandlerRegistered(this, UntypedChangedEventName))
 		{
 			EventManager<UntypedDataChangedEventArgs>.FireEvent(

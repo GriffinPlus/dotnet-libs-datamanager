@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,7 +18,7 @@ sealed partial class ChildDataNodeCollection
 {
 	#region ViewerChanged / ViewerChangedAsync
 
-	private const string ViewerChangedEventName = "Viewer" + ChangedEventName;
+	private const string ViewerChangedEventName = "ViewerChanged";
 
 	/// <summary>
 	/// Occurs when a node is added to or removed from the collection (considers regular and dummy nodes).<br/>

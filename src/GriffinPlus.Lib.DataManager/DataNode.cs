@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21,10 +21,10 @@ namespace GriffinPlus.Lib.DataManager;
 /// A node in the data tree.
 /// </summary>
 [InternalObjectSerializer(1)]
-[DebuggerDisplay("DataNode => Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
+[DebuggerDisplay("Name: {" + nameof(Name) + "}, Properties: {" + nameof(Properties) + "}, Path: {" + nameof(Path) + "}")]
 public partial class DataNode : IInternalObjectSerializer
 {
-	#region Changed
+	#region Changed / ChangedAsync
 
 	internal const string ChangedEventName = "Changed";
 
@@ -45,7 +45,7 @@ public partial class DataNode : IInternalObjectSerializer
 					this,
 					ChangedEventName,
 					value,
-					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
+					SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					this,
@@ -120,7 +120,10 @@ public partial class DataNode : IInternalObjectSerializer
 		DataTreeManagerHost    dataTreeManagerHost = null,
 		IDataManagerSerializer serializer          = null)
 	{
+		// check whether the specified name is valid
 		if (name == null) throw new ArgumentNullException(nameof(name));
+		if (!PathHelpers.IsValidName(name.AsSpan()))
+			throw new ArgumentException($"The specified name ({name}) does not comply with the rules for node names.", nameof(name));
 
 		if ((properties & ~DataNodeProperties.All) != 0)
 			throw new ArgumentException($"The specified properties (0x{properties:X}) contain unsupported flags (0x{properties & ~DataNodeProperties.All:X}).", nameof(properties));
@@ -131,10 +134,6 @@ public partial class DataNode : IInternalObjectSerializer
 		// the new node becomes the root node of a data tree
 		// => register a new data tree manager for it...
 		DataTreeManager = dataTreeManagerHost.CreateDataTreeManager(this, serializer);
-
-		// check whether the specified name is valid
-		if (!PathHelpers.IsValidName(name.AsSpan()))
-			throw new ArgumentException($"The specified name ({name}) does not comply with the rules for node names.", nameof(name));
 
 		mName = name;
 		mProperties = (DataNodePropertiesInternal)properties;
@@ -374,7 +373,7 @@ public partial class DataNode : IInternalObjectSerializer
 			{
 				// make the node regular, if it is a dummy node before proceeding
 				// (the ViewerDataNode class uses this property as well, so this node can also be dummy...)
-				if (IsDummyUnsynced) Regularize();
+				if (IsDummyUnsynced) RegularizeUnsynced();
 
 				// abort if the name did not change
 				if (mName == value)
@@ -383,7 +382,6 @@ public partial class DataNode : IInternalObjectSerializer
 				// ensure there is no node with the same name in the parent's child node collection
 				if (mParent?.Children.GetByNameUnsynced(value) != null)
 					throw new DataNodeExistsAlreadyException($"A node with the same name ({value}) does already exist at this level.");
-
 
 				// change the name and the resulting path and raise the appropriate events
 				// (the path only changes for nodes below the root node)
@@ -423,7 +421,7 @@ public partial class DataNode : IInternalObjectSerializer
 				if (pathChanged)
 				{
 					Children.ReinitializePathsRecursivelyUnsynced();
-					Values.ReinitializePathsRecursivelyUnsynced();
+					Values.ReinitializeDataValuePathsUnsynced();
 				}
 
 				// update data value reference objects to point to the proper data values, if necessary
@@ -505,14 +503,14 @@ public partial class DataNode : IInternalObjectSerializer
 			// regularize nodes up to the root node if the node becomes regular
 			if ((mProperties & DataNodePropertiesInternal.Dummy) != 0 && (value & DataNodePropertiesInternal.Dummy) == 0)
 			{
-				mParent?.Regularize();
+				mParent?.RegularizeUnsynced();
 			}
 
 			// make all nodes on the path to this node persistent as well, if the value is regular
 			// (for dummy nodes this is done as soon as the node becomes regular)
 			if ((value & DataNodePropertiesInternal.Dummy) == 0 && (value & DataNodePropertiesInternal.Persistent) != 0)
 			{
-				mParent?.MakePersistent();
+				mParent?.MakePersistentUnsynced();
 			}
 
 			// abort if the properties did not change
@@ -701,7 +699,7 @@ public partial class DataNode : IInternalObjectSerializer
 	}
 
 	/// <summary>
-	/// Gets the path of the current node in the data tree (for internal use only, not synchronized)
+	/// Gets the path of the current node in the data tree (for internal use only, not synchronized).
 	/// </summary>
 	public string PathUnsynced
 	{
@@ -1102,7 +1100,7 @@ public partial class DataNode : IInternalObjectSerializer
 						// data node exists already
 						// => regularize node, if necessary, and make it persistent, if the data value is persistent
 						DataNodePropertiesInternal newProperties = nextDataNode.PropertiesUnsynced;
-						newProperties &= DataNodePropertiesInternal.Dummy;
+						newProperties &= ~DataNodePropertiesInternal.Dummy;
 						newProperties |= (properties & DataValueProperties.Persistent) != 0
 							                 ? DataNodePropertiesInternal.Persistent
 							                 : DataNodePropertiesInternal.None;
@@ -1570,7 +1568,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// <summary>
 	/// Locks the entire data tree and calls the specified action method within the lock
 	/// (do not perform excessive calculations in the callback method and do not block, since the entire
-	/// data tree is locked and blocking might result in a deadlock!!!)
+	/// data tree is locked and blocking might result in a deadlock!!!).
 	/// </summary>
 	/// <param name="action">Method to call within the locked section.</param>
 	public void ExecuteAtomically(DataNodeAction action)
@@ -1584,7 +1582,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// <summary>
 	/// Locks the entire data tree and calls the specified action method within the lock
 	/// (do not perform excessive calculations in the callback method and do not block, since the entire
-	/// data tree is locked and blocking might result in a deadlock!!!)
+	/// data tree is locked and blocking might result in a deadlock!!!).
 	/// </summary>
 	/// <param name="action">Method to call within the locked section.</param>
 	/// <param name="state">Some state object to pass to the action.</param>
@@ -1690,7 +1688,7 @@ public partial class DataNode : IInternalObjectSerializer
 			topDown);
 
 		// set properties of data values
-		Values.SetPropertiesRecursivelyUnsynced(valuePropertiesToSet, valuePropertiesToClear);
+		Values.SetPropertiesOfDataValuesUnsynced(valuePropertiesToSet, valuePropertiesToClear);
 
 		// abort, if top-down mode...
 		if (topDown) return;
@@ -1785,7 +1783,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// Converts the current node and all nodes up to the root node to a regular nodes, if these nodes are dummy nodes
 	/// (for internal use only, not synchronized).
 	/// </summary>
-	internal void Regularize()
+	internal void RegularizeUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -1796,7 +1794,7 @@ public partial class DataNode : IInternalObjectSerializer
 
 		// current node is a dummy node, perhaps its parent is one as well
 		// => regularize its parent first...
-		mParent?.Regularize();
+		mParent?.RegularizeUnsynced();
 
 		// regularize the current node now...
 		DataNodePropertiesInternal newProperties = mProperties & ~DataNodePropertiesInternal.Dummy;
@@ -1817,12 +1815,12 @@ public partial class DataNode : IInternalObjectSerializer
 	/// <summary>
 	/// Makes the current node and all nodes up to the root node persistent (for internal use only, not synchronized).
 	/// </summary>
-	internal void MakePersistent()
+	internal void MakePersistentUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
 		// make all nodes up to the root persistent
-		mParent?.MakePersistent();
+		mParent?.MakePersistentUnsynced();
 
 		// make current node persistent
 		DataNodePropertiesInternal newProperties = mProperties | DataNodePropertiesInternal.Persistent;
@@ -1862,7 +1860,7 @@ public partial class DataNode : IInternalObjectSerializer
 	/// The synchronization object and the serializer remains the same to avoid synchronization issues,
 	/// but a new data tree manager is created.
 	/// </remarks>
-	internal void BecomeRootNode()
+	internal void BecomeRootNodeUnsynced()
 	{
 		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
 
@@ -1884,7 +1882,7 @@ public partial class DataNode : IInternalObjectSerializer
 
 		DataTreeManager = dataTreeManager;
 		Children.UpdateDataTreeManagerRecursivelyUnsynced(dataTreeManager);
-		Values.UpdateDataTreeManagerRecursivelyUnsynced(dataTreeManager);
+		Values.UpdateDataTreeManagerUnsynced(dataTreeManager);
 	}
 
 	/// <summary>
@@ -1946,7 +1944,7 @@ public partial class DataNode : IInternalObjectSerializer
 
 		// proceed changing the path of child nodes and data values...
 		Children.ReinitializePathsRecursivelyUnsynced();
-		Values.ReinitializePathsRecursivelyUnsynced();
+		Values.ReinitializeDataValuePathsUnsynced();
 	}
 
 	#endregion

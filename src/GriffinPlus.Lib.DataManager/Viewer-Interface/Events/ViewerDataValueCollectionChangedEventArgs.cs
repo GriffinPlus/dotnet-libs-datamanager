@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +31,7 @@ public sealed class ViewerDataValueCollectionChangedEventArgs : DataManagerEvent
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="ViewerDataValueCollectionChangedEventArgs"/> class (for a collection change)
+	/// Initializes a new instance of the <see cref="ViewerDataValueCollectionChangedEventArgs"/> class (for a collection change).
 	/// </summary>
 	/// <param name="action">Indicates whether <paramref name="dataValue"/> was added to or removed from <paramref name="parentNode"/>.</param>
 	/// <param name="parentNode">Data node containing the added/removed data value.</param>
@@ -70,19 +70,4 @@ public sealed class ViewerDataValueCollectionChangedEventArgs : DataManagerEvent
 	/// <see cref="Action"/> is <see cref="CollectionChangedAction.InitialUpdate"/>.
 	/// </summary>
 	public IEnumerable<IUntypedViewerDataValue> DataValues => mDataValues;
-
-	/// <summary>
-	/// Returns a number of copies of the current instance.
-	/// </summary>
-	/// <param name="count">Number of copies to create.</param>
-	/// <returns>
-	/// Copies of the current instance
-	/// (actually the current instance is returned, since the instance is immutable).
-	/// </returns>
-	public override DataManagerEventArgs[] Dupe(int count)
-	{
-		var copies = new DataManagerEventArgs[count];
-		for (int i = 0; i < count; i++) copies[i] = this;
-		return copies;
-	}
 }

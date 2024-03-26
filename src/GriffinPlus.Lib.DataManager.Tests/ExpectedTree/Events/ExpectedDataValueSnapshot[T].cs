@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10,33 +10,26 @@ namespace GriffinPlus.Lib.DataManager;
 /// <summary>
 /// An expected snapshot of a <see cref="DataValue{T}"/>.
 /// </summary>
-readonly struct ExpectedDataValueSnapshot<T>
+/// <param name="timestamp">The expected timestamp of the data value.</param>
+/// <param name="properties">The expected properties of the data value.</param>
+/// <param name="value">The expected value of the data value.</param>
+readonly struct ExpectedDataValueSnapshot<T>(
+	DateTime                    timestamp,
+	DataValuePropertiesInternal properties,
+	T                           value)
 {
-	/// <summary>
-	/// Initializes a new instance of the <see cref="ExpectedDataValueSnapshot{T}"/> class.
-	/// </summary>
-	internal ExpectedDataValueSnapshot(
-		DateTime                    timestamp,
-		DataValuePropertiesInternal properties,
-		T                           value)
-	{
-		Timestamp = timestamp;
-		mProperties = properties;
-		Value = value;
-	}
-
 	#region Timestamp
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="DataValueSnapshot{T}.Timestamp"/> property.
 	/// </summary>
-	public DateTime Timestamp { get; }
+	public DateTime Timestamp { get; } = timestamp;
 
 	#endregion
 
 	#region Properties (incl. Boolean Accessors)
 
-	private readonly DataValuePropertiesInternal mProperties;
+	private readonly DataValuePropertiesInternal mProperties = properties;
 
 	/// <summary>
 	/// Gets the expected value of the <see cref="DataValueSnapshot{T}.Properties"/> property.
@@ -60,7 +53,7 @@ readonly struct ExpectedDataValueSnapshot<T>
 	/// <summary>
 	/// Gets the expected value of the <see cref="DataValueSnapshot{T}.Value"/> property.
 	/// </summary>
-	public T Value { get; }
+	public T Value { get; } = value;
 
 	#endregion
 }

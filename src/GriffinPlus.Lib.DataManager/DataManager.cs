@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -180,7 +180,7 @@ public sealed class DataManager
 	}
 
 	/// <summary>
-	/// Triggers shutting down the data manager down and returns immediately.
+	/// Triggers shutting down the data manager down and returns immediately.<br/>
 	/// Pending operations will terminate on their own as soon as they are finished.
 	/// </summary>
 	public static void Shutdown()
@@ -211,21 +211,6 @@ public sealed class DataManager
 	/// Gets or sets the default serializer to use for serializing, deserializing and copying data in the data tree.
 	/// </summary>
 	public static IDataManagerSerializer DefaultSerializer { get; set; } = new DataManagerDefaultSerializer(SerializationOptimization.Speed, true);
-
-	/// <summary>
-	/// Checks whether the specified type is a valid serializer (throws an exception, if the type is not a valid serializer type).
-	/// </summary>
-	/// <param name="type">Type to check</param>
-	/// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
-	/// <exception cref="ArgumentException"><paramref name="type"/> is not a class, abstract or does not implement <see cref="IDataManagerSerializer"/>.</exception>
-	internal static void CheckSerializerType(Type type)
-	{
-		if (type == null) throw new ArgumentNullException(nameof(type));
-		if (!type.IsClass) throw new ArgumentException("The specified type must be a class.");
-		if (type.IsAbstract) throw new ArgumentException("The specified type must not be an abstract class.");
-		if (!typeof(IDataManagerSerializer).IsAssignableFrom(type))
-			throw new ArgumentException($"The specified type must implement {nameof(IDataManagerSerializer)}.");
-	}
 
 	#endregion
 

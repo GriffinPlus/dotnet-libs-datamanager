@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ partial class DataValue<T>
 					this,
 					ViewerChangedEventName,
 					value,
-					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
+					SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					ViewerWrapper,
@@ -101,7 +101,7 @@ partial class DataValue<T>
 					this,
 					ViewerUntypedChangedEventName,
 					value,
-					SynchronizationContext.Current ?? SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
+					SynchronizationContext.Current ?? DataTreeManager.Host.SynchronizationContext,
 					true,
 					true,
 					ViewerWrapper,

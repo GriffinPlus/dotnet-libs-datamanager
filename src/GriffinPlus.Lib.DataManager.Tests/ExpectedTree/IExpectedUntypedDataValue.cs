@@ -94,7 +94,7 @@ interface IExpectedUntypedDataValue : IExpectedItem
 	/// Checks whether the current bound actual viewer data value corresponds to the current expected data value.
 	/// </summary>
 	/// <param name="actualViewerDataValue">Actual viewer data value to compare with the expected data value.</param>
-	void CheckViewerConsistency(IUntypedViewerDataValue actualViewerDataValue);
+	void AssertViewerConsistency(IUntypedViewerDataValue actualViewerDataValue);
 
 	/// <summary>
 	/// Binds the specified actual data value to the current expected value and checks whether both are equal.
@@ -106,6 +106,16 @@ interface IExpectedUntypedDataValue : IExpectedItem
 	/// Recursively check whether data value events were raised as expected.
 	/// </summary>
 	void AssertExpectedEventsWereRaised();
+
+	/// <summary>
+	/// Registers all events of the actual data value.
+	/// </summary>
+	void RegisterEvents();
+
+	/// <summary>
+	/// Unregisters all events of the actual data value.
+	/// </summary>
+	void UnregisterEvents();
 
 	/// <summary>
 	/// Clears the lists of expected events.

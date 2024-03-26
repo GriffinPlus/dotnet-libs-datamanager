@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -182,8 +182,8 @@ partial class DataValueCollection
 			// ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
 			foreach (IUntypedDataValueInternal dataValue in mBuffer)
 			{
-				if (dataValue.NameUnsynced != name) continue;
 				if (!considerDummies && dataValue.IsDummyUnsynced) continue;
+				if (dataValue.NameUnsynced != name) continue;
 				return true;
 			}
 			return false;
@@ -347,7 +347,7 @@ partial class DataValueCollection
 		lock (mNode.DataTreeManager.Sync)
 		{
 			if (considerDummies) return [.. mBuffer.Select(x => x.ViewerWrapper)];
-			return [.. RegularValuesOnly.Select(x => x.ViewerWrapper)];
+			return [.. RegularValuesOnlyUnsynced.Select(x => x.ViewerWrapper)];
 		}
 	}
 

@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,17 +29,6 @@ public sealed class DataValueChangedEventArgs<T> : DataManagerEventArgs
 		mSnapshot = new DataValueSnapshot<T>(dataValue);
 		DataValue = dataValue;
 		ChangedFlags = changedFlags;
-	}
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="DataValueChangedEventArgs{T}"/> class copying another instance.
-	/// </summary>
-	/// <param name="other">Event arguments to copy.</param>
-	private DataValueChangedEventArgs(DataValueChangedEventArgs<T> other)
-	{
-		mSnapshot = new DataValueSnapshot<T>(other.mSnapshot);
-		DataValue = other.DataValue;
-		ChangedFlags = other.ChangedFlags;
 	}
 
 	#endregion
@@ -98,22 +87,6 @@ public sealed class DataValueChangedEventArgs<T> : DataManagerEventArgs
 	public DataValueChangedFlags ChangedFlags { get; }
 
 	#endregion
-
-	#endregion
-
-	#region Copying Event Arguments
-
-	/// <inheritdoc/>
-	public override DataManagerEventArgs[] Dupe(int count)
-	{
-		var copies = new DataManagerEventArgs[count];
-		for (int i = 0; i < count; i++)
-		{
-			copies[i] = new DataValueChangedEventArgs<T>(this);
-		}
-
-		return copies;
-	}
 
 	#endregion
 }

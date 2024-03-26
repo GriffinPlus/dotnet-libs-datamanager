@@ -1,5 +1,5 @@
 ﻿///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager)
+// This file is part of the Griffin+ common library suite (https://github.com/griffinplus/dotnet-libs-datamanager).
 // The source code is licensed under the MIT license.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,16 +23,6 @@ public interface IDataManagerSerializer
 	/// <returns>Copy of the specified object.</returns>
 	/// <exception cref="SerializationException">Copying object failed. See exception text and inner exception for details.</exception>
 	T CopySerializableValue<T>(T obj);
-
-	/// <summary>
-	/// Copies a serializable object multiple times.
-	/// </summary>
-	/// <typeparam name="T">Type of the value to copy.</typeparam>
-	/// <param name="obj">Object to copy.</param>
-	/// <param name="count">Number of copies to create.</param>
-	/// <returns>Copies of the specified object.</returns>
-	/// <exception cref="SerializationException">Copying object failed. See exception text and inner exception for details.</exception>
-	T[] CopySerializableValue<T>(T obj, int count);
 
 	/// <summary>
 	/// Serializes the specified data tree starting with the specified data node to the specified stream.
@@ -61,6 +51,7 @@ public interface IDataManagerSerializer
 	/// <param name="node">Root node to serialize.</param>
 	/// <param name="fileName">Name of the file to write the node to.</param>
 	/// <exception cref="ArgumentNullException"><paramref name="node"/> or <paramref name="fileName"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException"><paramref name="fileName"/> is not a valid relative or absolute file path.</exception>
 	/// <exception cref="SerializationException">Serializing object failed. See exception text and inner exception for details.</exception>
 	void WriteToFile(DataNode node, string fileName);
 
@@ -73,6 +64,7 @@ public interface IDataManagerSerializer
 	/// </param>
 	/// <returns>Root node of the loaded data tree.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="fileName"/> is <c>null</c>.</exception>
+	/// <exception cref="ArgumentException"><paramref name="fileName"/> is not a valid relative or absolute file path.</exception>
 	/// <exception cref="FileNotFoundException"><paramref name="fileName"/> does not exist.</exception>
 	/// <exception cref="SerializationException">Deserializing object failed. See exception text and inner exception for details.</exception>
 	DataNode ReadFromFile(string fileName, DataTreeManagerHost dataTreeManagerHost = null);
