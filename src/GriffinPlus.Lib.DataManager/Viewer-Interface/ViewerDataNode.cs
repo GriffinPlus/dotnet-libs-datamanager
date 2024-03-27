@@ -98,6 +98,12 @@ public sealed class ViewerDataNode
 		return WrappedNode.ViewerCopy(destinationNode, renameIfNecessary);
 	}
 
+	/// <inheritdoc cref="DataNode.Remove()"/>
+	public void Remove()
+	{
+		WrappedNode.Remove();
+	}
+
 	/// <inheritdoc cref="DataNode.ViewerExecuteAtomically(ViewerDataNodeAction)"/>
 	public void ExecuteAtomically(ViewerDataNodeAction action)
 	{
