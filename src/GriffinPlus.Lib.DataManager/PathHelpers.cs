@@ -14,7 +14,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// <summary>
 /// Helper functions that come in handy when working with path strings.
 /// </summary>
-static class PathHelpers
+public static class PathHelpers
 {
 	internal const char   EscapeChar    = '\\';
 	internal const char   SeparatorChar = '/';
@@ -35,6 +35,7 @@ static class PathHelpers
 	/// - Name does not contain any leading or trailing whitespaces<br/>
 	/// - Name does not contain control characters from control code set C0 (U+0000 to U+001F)<br/>
 	/// - Name does not contain control characters from control code set C1 (U+0080 to U+009F)<br/>
+	/// - Name does not contain a DEL character (U+007F)
 	/// </remarks>
 	public static bool IsValidName(ReadOnlySpan<char> name)
 	{
