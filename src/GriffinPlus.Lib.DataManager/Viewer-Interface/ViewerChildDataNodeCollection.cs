@@ -118,6 +118,18 @@ public sealed class ViewerChildDataNodeCollection : IEnumerable<ViewerDataNode>
 		return WrappedCollection.ViewerRemoveAll(predicate);
 	}
 
+	/// <inheritdoc cref="ChildDataNodeCollection.ViewerRequestItems(RequestViewerDataNodesCallback, object)"/>
+	public void RequestItems(RequestViewerDataNodesCallback callback, object state = null)
+	{
+		WrappedCollection.ViewerRequestItems(callback, state);
+	}
+
+	/// <inheritdoc cref="ChildDataNodeCollection.ViewerRequestItemsAsync(RequestViewerDataNodesCallback, object)"/>
+	public void RequestItemsAsync(RequestViewerDataNodesCallback callback, object state = null)
+	{
+		WrappedCollection.ViewerRequestItemsAsync(callback, state);
+	}
+
 	/// <inheritdoc cref="ChildDataNodeCollection.ViewerToArray()"/>
 	public ViewerDataNode[] ToArray()
 	{

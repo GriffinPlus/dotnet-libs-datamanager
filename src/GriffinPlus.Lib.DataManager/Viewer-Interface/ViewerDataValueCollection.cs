@@ -119,6 +119,18 @@ public sealed class ViewerDataValueCollection : IEnumerable<IUntypedViewerDataVa
 		return WrappedCollection.ViewerRemoveAll(predicate);
 	}
 
+	/// <inheritdoc cref="DataValueCollection.ViewerRequestItems(RequestViewerDataValuesCallback, object)"/>
+	public void RequestItems(RequestViewerDataValuesCallback callback, object state = null)
+	{
+		WrappedCollection.ViewerRequestItems(callback, state);
+	}
+
+	/// <inheritdoc cref="DataValueCollection.ViewerRequestItemsAsync(RequestViewerDataValuesCallback, object)"/>
+	public void RequestItemsAsync(RequestViewerDataValuesCallback callback, object state = null)
+	{
+		WrappedCollection.ViewerRequestItemsAsync(callback, state);
+	}
+
 	/// <inheritdoc cref="DataValueCollection.ViewerToArray(bool)"/>
 	public IUntypedViewerDataValue[] ToArray(bool considerDummies)
 	{

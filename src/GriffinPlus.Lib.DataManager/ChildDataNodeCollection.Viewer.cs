@@ -234,6 +234,46 @@ sealed partial class ChildDataNodeCollection
 
 	#endregion
 
+	#region ViewerRequestItems() / ViewerRequestItemsAsync()
+
+	/// <summary>
+	/// Gets the data nodes in the collection asynchronously via the specified callback.<br/>
+	/// The callback will be scheduled using the <see cref="SynchronizationContext"/> of the executing thread, if available.<br/>
+	/// If the registering thread does not have a synchronization context, the invocation will be scheduled on the data tree manager thread.<br/>
+	/// This method is designed to work in conjunction with the <see cref="Changed"/> event.
+	/// </summary>
+	/// <param name="callback">Callback that will receive the data nodes that are currently in the collection.</param>
+	/// <param name="state">Some context object to pass to the <paramref name="callback"/> method.</param>
+	internal void ViewerRequestItems(RequestViewerDataNodesCallback callback, object state = null)
+	{
+		lock (mNode.DataTreeManager.Sync)
+		{
+			SynchronizationContext synchronizationContext = SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext;
+			DataNode[] nodes = [.. mBuffer];
+			synchronizationContext.Post(_ => callback(ViewerWrapper, nodes, state), null);
+		}
+	}
+
+	/// <summary>
+	/// Gets the data nodes in the collection asynchronously via the specified callback.<br/>
+	/// The callback will be scheduled using the <see cref="SynchronizationContext"/> of the executing thread, if available.<br/>
+	/// The invocation will always be scheduled on the data tree manager thread.<br/>
+	/// This method is designed to work in conjunction with the <see cref="ChangedAsync"/> event.
+	/// </summary>
+	/// <param name="callback">Callback that will receive the data nodes that are currently in the collection.</param>
+	/// <param name="state">Some context object to pass to the <paramref name="callback"/> method.</param>
+	internal void ViewerRequestItemsAsync(RequestViewerDataNodesCallback callback, object state = null)
+	{
+		lock (mNode.DataTreeManager.Sync)
+		{
+			SynchronizationContext synchronizationContext = mNode.DataTreeManager.Host.SynchronizationContext;
+			DataNode[] nodes = [.. mBuffer];
+			synchronizationContext.Post(_ => callback(ViewerWrapper, nodes, state), null);
+		}
+	}
+
+	#endregion
+
 	#region ViewerToArray()
 
 	/// <summary>

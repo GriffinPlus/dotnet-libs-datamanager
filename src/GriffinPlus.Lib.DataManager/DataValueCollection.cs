@@ -909,6 +909,46 @@ public partial class DataValueCollection :
 
 	#endregion
 
+	#region RequestItems() / RequestItemsAsync()
+
+	/// <summary>
+	/// Gets the data values in the collection asynchronously via the specified callback.<br/>
+	/// The callback will be scheduled using the <see cref="SynchronizationContext"/> of the executing thread, if available.<br/>
+	/// If the registering thread does not have a synchronization context, the invocation will be scheduled on the data tree manager thread.<br/>
+	/// This method is designed to work in conjunction with the <see cref="Changed"/> event.
+	/// </summary>
+	/// <param name="callback">Callback that will receive the data values that are currently in the collection.</param>
+	/// <param name="state">Some context object to pass to the <paramref name="callback"/> method.</param>
+	public void RequestItems(RequestDataValuesCallback callback, object state = null)
+	{
+		lock (mNode.DataTreeManager.Sync)
+		{
+			SynchronizationContext synchronizationContext = SynchronizationContext.Current ?? mNode.DataTreeManager.Host.SynchronizationContext;
+			IUntypedDataValue[] dataValues = RegularValuesOnlyUnsynced.ToArray();
+			synchronizationContext.Post(_ => callback(this, dataValues, state), null);
+		}
+	}
+
+	/// <summary>
+	/// Gets the data values in the collection asynchronously via the specified callback.<br/>
+	/// The callback will be scheduled using the <see cref="SynchronizationContext"/> of the executing thread, if available.<br/>
+	/// The invocation will always be scheduled on the data tree manager thread.<br/>
+	/// This method is designed to work in conjunction with the <see cref="ChangedAsync"/> event.
+	/// </summary>
+	/// <param name="callback">Callback that will receive the data values that are currently in the collection.</param>
+	/// <param name="state">Some context object to pass to the <paramref name="callback"/> method.</param>
+	public void RequestItemsAsync(RequestDataValuesCallback callback, object state = null)
+	{
+		lock (mNode.DataTreeManager.Sync)
+		{
+			SynchronizationContext synchronizationContext = mNode.DataTreeManager.Host.SynchronizationContext;
+			IUntypedDataValue[] dataValues = RegularValuesOnlyUnsynced.ToArray();
+			synchronizationContext.Post(_ => callback(this, dataValues, state), null);
+		}
+	}
+
+	#endregion
+
 	#region ToArray()
 
 	/// <summary>
