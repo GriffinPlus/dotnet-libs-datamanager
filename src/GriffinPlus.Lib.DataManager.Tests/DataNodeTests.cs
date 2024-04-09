@@ -115,7 +115,7 @@ public class DataNodeTests
 		IDataManagerSerializer expectedSerializer = serializer ?? DataManager.DefaultSerializer;
 		Assert.Same(expectedSerializer, node.DataTreeManager.Serializer);
 
-		// a root node should neither have a parent node nor a name
+		// a root node should neither have a parent node nor its name in the path
 		Assert.Null(node.Parent);
 		Assert.Equal(name, node.Name);
 		Assert.Equal("/", node.Path);
@@ -671,7 +671,8 @@ public class DataNodeTests
 	}
 
 	/// <summary>
-	/// Tests setting the <see cref="DataNode.IsPersistent"/> property to <c>false</c>.
+	/// Tests setting the <see cref="DataNode.IsPersistent"/> property to <c>true</c>.<br/>
+	/// The touched node and all nodes up to the root should become persistent as well.
 	/// </summary>
 	[Theory]
 	[MemberData(nameof(ExpectedDataTree.AllNodePaths), MemberType = typeof(ExpectedDataTree))]
@@ -689,7 +690,8 @@ public class DataNodeTests
 	}
 
 	/// <summary>
-	/// Tests setting the <see cref="DataNode.IsPersistent"/> property to <c>false</c>.
+	/// Tests setting the <see cref="DataNode.IsPersistent"/> property to <c>false</c>.<br/>
+	/// Only the touched node should change its state.
 	/// </summary>
 	[Theory]
 	[MemberData(nameof(ExpectedDataTree.AllNodePaths), MemberType = typeof(ExpectedDataTree))]
