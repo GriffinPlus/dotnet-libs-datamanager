@@ -84,6 +84,16 @@ public sealed partial class DataTreeManagerHost
 	public SynchronizationContext SynchronizationContext => mHostThread.SynchronizationContext;
 
 	/// <summary>
+	/// Gets or sets the interval between two periodic checks for dead <see cref="Data{T}"/> objects (default: 10 seconds).
+	/// </summary>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/> was less than or equal to zero.</exception>
+	public TimeSpan PeriodicCheckInterval
+	{
+		get => mHostThread.PeriodicCheckInterval;
+		set => mHostThread.PeriodicCheckInterval = value;
+	}
+
+	/// <summary>
 	/// Creates a new instance of the <see cref="DataTreeManager"/> class associated with the current host.
 	/// </summary>
 	/// <param name="root">Root node of the data tree to manage.</param>

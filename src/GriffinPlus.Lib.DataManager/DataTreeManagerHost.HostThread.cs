@@ -18,9 +18,9 @@ sealed partial class DataTreeManagerHost
 	private sealed class HostThread
 	{
 		private readonly WeakReference<DataTreeManagerHost> mHostWeakReference;
-		private readonly Thread                             mThread;
-		private readonly ManualResetEventSlim               mThreadStartedEvent;
-		private readonly CancellationTokenSource            mShutdownCancellationTokenSource;
+		private readonly object                             mParameterSync;
+
+		#region Construction/Start and Shutdown
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HostThread"/> class.
@@ -31,8 +31,10 @@ sealed partial class DataTreeManagerHost
 		public HostThread(DataTreeManagerHost host, string name)
 		{
 			if (host == null) throw new ArgumentNullException(nameof(host));
+			mParameterSync = new object();
 			mHostWeakReference = new WeakReference<DataTreeManagerHost>(host);
 			mShutdownCancellationTokenSource = new CancellationTokenSource();
+			mParametersChangedEvent = new AsyncAutoResetEvent();
 			mThreadStartedEvent = new ManualResetEventSlim(false);
 			name = name != null ? $"Data Tree Manager Host (name: {name})" : "Data Tree Manager Host";
 			mThread = new Thread(ThreadProc) { IsBackground = true, Name = name };
@@ -52,18 +54,55 @@ sealed partial class DataTreeManagerHost
 			if (mThread.Join(2000)) return;
 			sLog.Write(LogLevel.Error, "Waiting for data tree manager thread to join seems to hang...");
 			mThread.Join();
+
+			// clean up
+			mShutdownCancellationTokenSource.Dispose();
 		}
 
+		#endregion
+
+		#region PeriodicCheckInterval
+
+		private TimeSpan mPeriodicCheckInterval = TimeSpan.FromSeconds(10);
+
 		/// <summary>
-		/// Gets the interval between two periodic checks for dead <see cref="Data{T}"/> objects.
+		/// Gets or sets the interval between two periodic checks for dead <see cref="Data{T}"/> objects (default: 10 seconds).
 		/// </summary>
-		private TimeSpan PeriodicCheckInterval { get; } = TimeSpan.FromSeconds(10);
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/> was less than or equal to zero.</exception>
+		public TimeSpan PeriodicCheckInterval
+		{
+			get => mPeriodicCheckInterval;
+			set
+			{
+				if (value <= TimeSpan.Zero)
+					throw new ArgumentOutOfRangeException(nameof(value), "The interval must be greater than zero.");
+
+				lock (mParameterSync)
+				{
+					mPeriodicCheckInterval = value;
+					mParametersChangedEvent.Set();
+				}
+			}
+		}
+
+		#endregion
+
+		#region SynchronizationContext
 
 		/// <summary>
 		/// Gets the <see cref="System.Threading.SynchronizationContext"/> of the data tree manager thread
 		/// (can be used to schedule work on the thread).
 		/// </summary>
 		public SynchronizationContext SynchronizationContext { get; private set; }
+
+		#endregion
+
+		#region Processing Thread
+
+		private readonly Thread                  mThread;
+		private readonly ManualResetEventSlim    mThreadStartedEvent;
+		private readonly CancellationTokenSource mShutdownCancellationTokenSource;
+		private readonly AsyncAutoResetEvent     mParametersChangedEvent;
 
 		/// <summary>
 		/// Thread calling event handlers that have been put into the queue.
@@ -82,6 +121,13 @@ sealed partial class DataTreeManagerHost
 				// get cancellation token that is signaled to shut the loop down
 				CancellationToken shutdownCancellationToken = mShutdownCancellationTokenSource.Token;
 
+				// load parameters initially
+				TimeSpan periodicCheckInterval;
+				lock (mParameterSync)
+				{
+					periodicCheckInterval = mPeriodicCheckInterval;
+				}
+
 				// signal that the thread has started up and initialized the synchronization context
 				mThreadStartedEvent.Set();
 
@@ -89,13 +135,18 @@ sealed partial class DataTreeManagerHost
 				{
 					// wait for the timeout to elapse
 					// (scheduled event/method invocations are processed meanwhile)
-					try
+					Task task1 = Task.Delay(periodicCheckInterval, shutdownCancellationToken);
+					Task task2 = mParametersChangedEvent.WaitAsync(shutdownCancellationToken);
+					await Task.WhenAny(task1, task2); // does not throw exceptions, so cancellation must be checked separately...
+					if (shutdownCancellationToken.IsCancellationRequested) return;
+
+					// reload parameters, if they have changed
+					if (task2.Status == TaskStatus.RanToCompletion)
 					{
-						await Task.Delay(PeriodicCheckInterval, shutdownCancellationToken);
-					}
-					catch (OperationCanceledException)
-					{
-						return;
+						lock (mParameterSync)
+						{
+							periodicCheckInterval = mPeriodicCheckInterval;
+						}
 					}
 
 					// try to get the manager host instance the thread operates upon and abort,
@@ -111,5 +162,7 @@ sealed partial class DataTreeManagerHost
 				}
 			}
 		}
+
+		#endregion
 	}
 }
