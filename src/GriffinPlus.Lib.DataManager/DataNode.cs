@@ -1046,6 +1046,34 @@ public partial class DataNode : IInternalObjectSerializer
 		return null;
 	}
 
+	/// <summary>
+	/// Gets the data value at the specified path.<br/>
+	/// This method does not create the path to the data value, if it does not exist, yet.<br/>
+	/// For internal use only, not synchronized.
+	/// </summary>
+	/// <param name="path">The path of the data value to get.</param>
+	/// <returns>The data value at the specified path.</returns>
+	internal IUntypedDataValueInternal GetDataValueUntypedInternalUnsynced(ReadOnlySpan<char> path)
+	{
+		Debug.Assert(Monitor.IsEntered(DataTreeManager.Sync), "The tree synchronization object is not locked.");
+
+		var pathParser = PathParser.Create(path, false);
+		DataNode currentDataNode = pathParser.IsAbsolutePath ? DataTreeManager.RootNode : this;
+		while (pathParser.GetNext(out ReadOnlySpan<char> token, out bool isLastToken))
+		{
+			if (isLastToken) // a data value
+				return currentDataNode.Values.FindUnsynced(token);
+
+			// a data node
+			DataNode nextDataNode = currentDataNode.Children.GetByNameUnsynced(token);
+			if (nextDataNode == null) return null;
+			currentDataNode = nextDataNode;
+		}
+
+		Debug.Fail("Should never occur.");
+		return null;
+	}
+
 	#endregion
 
 	#region Setting a Data Value (DataValue<T>)

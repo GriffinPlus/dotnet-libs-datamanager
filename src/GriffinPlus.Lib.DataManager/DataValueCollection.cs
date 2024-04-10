@@ -855,24 +855,10 @@ public partial class DataValueCollection :
 
 		IUntypedDataValueInternal dataValue = mBuffer[index];
 
-		// unregister data value references, if any
+		// unregister data value references, remove the data value and register data values references again
 		IUntypedDataInternal[] references = mNode.DataTreeManager.UnregisterDataValueReferencesUnsynced(dataValue, true);
-
-		if (dataValue.IsDummyUnsynced)
-		{
-			// unregistering removed the data value as it is dummy
-			// => nothing to do here...
-			Debug.Assert(!mBuffer.Any(otherDataValue => ReferenceEquals(dataValue, otherDataValue)));
-		}
-		else
-		{
-			// unregistering did not remove the data value as it is regular
-			// => remove data value from the collection and detach it from the data tree
-			mBuffer.RemoveAt(index);
-			dataValue.DetachFromDataTreeUnsynced();
-		}
-
-		// register previously removed data value references
+		mBuffer.RemoveAt(index);
+		dataValue.DetachFromDataTreeUnsynced();
 		mNode.DataTreeManager.RegisterDataValueReferencesUnsynced(references);
 
 		// raise 'Changed' event and 'ChangedAsync', if the removed data value was regular

@@ -303,7 +303,7 @@ public class DataTreeManager
 					return false;
 
 				// remove the referenced data value from the tree, if it is a dummy value
-				IUntypedDataValueInternal dataValue = root.GetDataValueUntypedUnsynced(path.AsSpan().TrimStart(PathHelpers.SeparatorChar));
+				IUntypedDataValueInternal dataValue = root.GetDataValueUntypedInternalUnsynced(path.AsSpan());
 				if (dataValue == null) continue;
 				if (!dataValue.IsDummyUnsynced) continue;
 				DataNode node = dataValue.ParentNodeUnsynced;
@@ -344,7 +344,7 @@ public class DataTreeManager
 
 		// remove the referenced data value from the tree, if it is a dummy value
 		if (!mRootNode.TryGetTarget(out DataNode root)) return;
-		IUntypedDataValueInternal dataValue = root.GetDataValueUntypedUnsynced(data.Path.AsSpan().TrimStart(PathHelpers.SeparatorChar));
+		IUntypedDataValueInternal dataValue = root.GetDataValueUntypedInternalUnsynced(data.Path.AsSpan());
 		if (dataValue == null) return;
 		if (!dataValue.IsDummyUnsynced) return;
 		DataNode node = dataValue.ParentNode;

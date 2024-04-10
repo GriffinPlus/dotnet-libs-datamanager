@@ -244,7 +244,14 @@ public sealed partial class ChildDataNodeCollection :
 	/// <summary>
 	/// Gets the internal list of child data nodes (considers regular and dummy nodes).
 	/// </summary>
-	internal IReadOnlyList<DataNode> InternalBuffer => mBuffer;
+	internal IReadOnlyList<DataNode> InternalBuffer
+	{
+		get
+		{
+			Debug.Assert(Monitor.IsEntered(mNode.DataTreeManager.Sync), "The tree synchronization object is not locked.");
+			return mBuffer;
+		}
+	}
 
 	#endregion
 
