@@ -105,6 +105,12 @@ sealed partial class DataTreeManagerHost
 		private readonly AsyncAutoResetEvent     mParametersChangedEvent;
 
 		/// <summary>
+		/// Gets the <see cref="System.Threading.Thread"/> of the data tree manager thread.
+		/// </summary>
+		// ReSharper disable once ConvertToAutoPropertyWhenPossible
+		internal Thread Thread => mThread;
+
+		/// <summary>
 		/// Thread calling event handlers that have been put into the queue.
 		/// </summary>
 		private void ThreadProc()

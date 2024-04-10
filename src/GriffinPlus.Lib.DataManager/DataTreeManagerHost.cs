@@ -84,6 +84,11 @@ public sealed partial class DataTreeManagerHost
 	public SynchronizationContext SynchronizationContext => mHostThread.SynchronizationContext;
 
 	/// <summary>
+	/// Gets the <see cref="System.Threading.Thread"/> of the data tree manager host thread.
+	/// </summary>
+	internal Thread Thread => mHostThread.Thread;
+
+	/// <summary>
 	/// Gets or sets the interval between two periodic checks for dead <see cref="Data{T}"/> objects (default: 10 seconds).
 	/// </summary>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/> was less than or equal to zero.</exception>
