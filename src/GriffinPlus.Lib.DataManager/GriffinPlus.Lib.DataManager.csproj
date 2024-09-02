@@ -12,17 +12,23 @@
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<!--
-		CommunityToolkit.HighPerformance 7.1.2 depends on System.Runtime.CompilerServices.Unsafe 5.0.0
-		that is needed for support of .NET Core 2.2
-		-->
-		<PackageReference Include="CommunityToolkit.HighPerformance" Version="7.1.2" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0'">
-		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" />
-	</ItemGroup>
+	<!--
+		Use CommunityToolkit.HighPerformance:
+		version 7.1.2 depends on System.Runtime.CompilerServices.Unsafe 5.0.0 that is needed
+		for support of .NET Core 2.2, other frameworks can safely use the latest version
+	-->
+	<Choose>
+		<When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+			<ItemGroup>
+				<PackageReference Include="CommunityToolkit.HighPerformance" Version="7.1.2" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
 
 	<ItemGroup>
 		<PackageReference Include="GriffinPlus.Lib.Common" Version="4.1.4" />
