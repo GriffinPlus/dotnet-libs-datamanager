@@ -1,0 +1,14 @@
+﻿.\CommunityToolkit.HighPerformance.dll
+.\GriffinPlus.Lib.Common.dll
+.\GriffinPlus.Lib.DataManager.dll
+.\GriffinPlus.Lib.DataManager.pdb
+.\GriffinPlus.Lib.DataManager.xml
+.\GriffinPlus.Lib.FastActivator.dll
+.\GriffinPlus.Lib.Logging.Interface.dll
+.\GriffinPlus.Lib.Serialization.dll
+.\Microsoft.Bcl.HashCode.dll
+.\System.Buffers.dll
+.\System.Memory.dll
+.\System.Numerics.Vectors.dll
+.\System.Runtime.CompilerServices.Unsafe.dll
+.\System.Threading.Tasks.Extensions.dll

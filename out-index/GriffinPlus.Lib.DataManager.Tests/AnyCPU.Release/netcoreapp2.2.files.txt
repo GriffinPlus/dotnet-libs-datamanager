@@ -1,0 +1,13 @@
+﻿.\GriffinPlus.Lib.DataManager.dll
+.\GriffinPlus.Lib.DataManager.pdb
+.\GriffinPlus.Lib.DataManager.Tests.deps.json
+.\GriffinPlus.Lib.DataManager.Tests.dll
+.\GriffinPlus.Lib.DataManager.Tests.pdb
+.\GriffinPlus.Lib.DataManager.Tests.runtimeconfig.dev.json
+.\GriffinPlus.Lib.DataManager.Tests.runtimeconfig.json
+.\GriffinPlus.Lib.DataManager.xml
+.\testhost.dll
+.\testhost.exe
+.\xunit.runner.reporters.netcoreapp10.dll
+.\xunit.runner.utility.netcoreapp10.dll
+.\xunit.runner.visualstudio.dotnetcore.testadapter.dll
