@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Xunit;
@@ -15,7 +16,6 @@ namespace GriffinPlus.Lib.DataManager;
 /// </summary>
 public class DataTreeManagerHostTests
 {
-
 	/// <summary>
 	/// Tests creating an instance of the <see cref="DataTreeManagerHost"/> class.
 	/// </summary>
@@ -44,13 +44,17 @@ public class DataTreeManagerHostTests
 
 		// create a data tree manager host and return a weak reference to it to check,
 		// whether it is collected properly later on
-		WeakReference<DataTreeManagerHost> weakDataDataTreeManagerHost = CreateDataTreeManagerHost(out Thread hostThread);
+		WeakReference weakDataDataTreeManagerHost = CreateDataTreeManagerHost(out Thread hostThread);
 
-		// trigger garbage collection
+		// trigger garbage collection and wait for it to release the object (max. 10000 ms)
 		GC.Collect();
+		for (int i = 0; weakDataDataTreeManagerHost.IsAlive && i < 100; i++)
+		{
+			Thread.Sleep(100);
+		}
 
 		// the host should have been collected now
-		Assert.False(weakDataDataTreeManagerHost.TryGetTarget(out DataTreeManagerHost _));
+		Assert.False(weakDataDataTreeManagerHost.IsAlive);
 
 		// the thread running the processing loop in the data tree manager host should terminate automatically
 		// after it has detected that its host has been collected
@@ -59,7 +63,8 @@ public class DataTreeManagerHostTests
 
 		return;
 
-		WeakReference<DataTreeManagerHost> CreateDataTreeManagerHost(out Thread thread)
+		[MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+		WeakReference CreateDataTreeManagerHost(out Thread thread)
 		{
 			// create a data tree manager host
 			var host = new DataTreeManagerHost
@@ -71,7 +76,7 @@ public class DataTreeManagerHostTests
 			thread = host.Thread;
 
 			// return a weak reference the data tree manager host to track whether it has been collected later on
-			return new WeakReference<DataTreeManagerHost>(host);
+			return new WeakReference(host);
 		}
 	}
 }

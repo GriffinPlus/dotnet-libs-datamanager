@@ -4,6 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Xunit;
@@ -39,13 +40,17 @@ public class DataTests
 
 		// create a data value reference and return a weak reference to it to check,
 		// whether it is collected properly later on
-		WeakReference<Data<int>> weakDataValueReference = CreateDataValueReference(path, root);
+		WeakReference weakDataValueReference = CreateDataValueReference(path, root);
 
-		// trigger garbage collection
+		// trigger garbage collection and wait for it to release the object (max. 10000 ms)
 		GC.Collect();
+		for (int i = 0; weakDataValueReference.IsAlive && i < 100; i++)
+		{
+			Thread.Sleep(100);
+		}
 
-		// the data value reference should have been collected now
-		Assert.False(weakDataValueReference.TryGetTarget(out Data<int> _));
+		// the data value reference should have been collected now...
+		Assert.False(weakDataValueReference.IsAlive);
 
 		// let the data tree manager clean up dummy data nodes/values that belong to collected data value references
 		// (this method is periodically invoked by the data tree manager host thread)
@@ -69,7 +74,8 @@ public class DataTests
 
 		return;
 
-		static WeakReference<Data<int>> CreateDataValueReference(string path, DataNode root)
+		[MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+		static WeakReference CreateDataValueReference(string path, DataNode root)
 		{
 			// create a data value reference
 			// (should create the path to a dummy data value as the data tree is empty)
@@ -85,7 +91,7 @@ public class DataTests
 			}
 
 			// return a weak reference the data value reference to track whether it has been collected later on
-			return new WeakReference<Data<int>>(dataValueReference);
+			return new WeakReference(dataValueReference);
 		}
 	}
 }
