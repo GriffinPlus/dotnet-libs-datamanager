@@ -14,6 +14,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// <summary>
 /// Tests targeting the <see cref="Data{T}"/> class.
 /// </summary>
+[Collection(nameof(NoParallelizationCollection))]
 public class DataTests
 {
 	[Theory]
@@ -42,12 +43,9 @@ public class DataTests
 		// whether it is collected properly later on
 		WeakReference weakDataValueReference = CreateDataValueReference(path, root);
 
-		// trigger garbage collection and wait for it to release the object (max. 10000 ms)
+		// trigger garbage collection and wait for it to release the object
 		GC.Collect();
-		for (int i = 0; weakDataValueReference.IsAlive && i < 100; i++)
-		{
-			Thread.Sleep(100);
-		}
+		GC.WaitForPendingFinalizers();
 
 		// the data value reference should have been collected now...
 		Assert.False(weakDataValueReference.IsAlive);
@@ -56,8 +54,8 @@ public class DataTests
 		// (this method is periodically invoked by the data tree manager host thread)
 		// root.DataTreeManager.CheckPeriodically();
 
-		// wait for the data tree manager thread to clean up at least once
-		Thread.Sleep(periodicCheckInterval + TimeSpan.FromMilliseconds(50));
+		// wait for the data tree manager thread to clean up
+		Thread.Sleep(10 * (int)periodicCheckInterval.TotalMilliseconds);
 
 		// check whether the underlying dummy node has been removed as expected
 		lock (root.DataTreeManager.Sync)

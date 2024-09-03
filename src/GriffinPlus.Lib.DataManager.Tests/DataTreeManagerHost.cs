@@ -14,6 +14,7 @@ namespace GriffinPlus.Lib.DataManager;
 /// <summary>
 /// Tests targeting the <see cref="DataTreeManagerHost"/> class.
 /// </summary>
+[Collection(nameof(NoParallelizationCollection))]
 public class DataTreeManagerHostTests
 {
 	/// <summary>
@@ -46,19 +47,16 @@ public class DataTreeManagerHostTests
 		// whether it is collected properly later on
 		WeakReference weakDataDataTreeManagerHost = CreateDataTreeManagerHost(out Thread hostThread);
 
-		// trigger garbage collection and wait for it to release the object (max. 10000 ms)
+		// trigger garbage collection and wait for it to release the object
 		GC.Collect();
-		for (int i = 0; weakDataDataTreeManagerHost.IsAlive && i < 100; i++)
-		{
-			Thread.Sleep(100);
-		}
+		GC.WaitForPendingFinalizers();
 
 		// the host should have been collected now
 		Assert.False(weakDataDataTreeManagerHost.IsAlive);
 
 		// the thread running the processing loop in the data tree manager host should terminate automatically
 		// after it has detected that its host has been collected
-		Thread.Sleep(periodicCheckInterval + TimeSpan.FromMilliseconds(50));
+		Thread.Sleep(10 * (int)periodicCheckInterval.TotalMilliseconds);
 		Assert.False(hostThread.IsAlive);
 
 		return;
